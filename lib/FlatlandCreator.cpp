@@ -1,8 +1,7 @@
 #include "FlatlandCreator.h"
-#include "Flatland.h"
 
-Flatland FlatlandCreator::CreateFlatland(unsigned int width, unsigned int height, unsigned int cells)
+template <>
+SimpleCellMap SimpleMapCreator::Create(const SimpleSpec& spec)
 {
-    // TODO Not implemented
-    return Flatland();
+    return {};
 }

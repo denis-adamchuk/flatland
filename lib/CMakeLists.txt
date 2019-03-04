@@ -2,12 +2,11 @@ cmake_minimum_required(VERSION 3.0)
 
 set(LIB_NAME flatland_lib)
 
-project(${LIB_NAME})
 set(SOURCES
-Flatland.cpp
-Flatland.h
-FlatlandCreator.cpp
-FlatlandCreator.h
-FlatlandCreatorItf.h)
+SimpleFlatland.cpp
+SimpleFlatland.h
+SimpleMapCreator.cpp
+SimpleMapCreator.h
+MapCreator.h)
 
 add_library(${LIB_NAME} STATIC ${SOURCES})

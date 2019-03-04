@@ -1,15 +1,21 @@
 #pragma once
 
-class IFlatlandCreator;
+#include "SimpleMapCreator.h"
+
+namespace flatland
+{
+
+namespace lib
+{
 
 // Defines a world of cells
-class Flatland
+class SimpleFlatland
 {
 public:
     // Creates a world of the given size
-    Flatland(unsigned int width, unsigned int height, unsigned int cells, const IFlatlandCreator& creator);
+    SimpleFlatland(const SimpleCellMap& flatlandMap);
 
-    // Evaluates a next genaration of cells
+    // Evaluates a next generation of cells
     void Run();
 
     // Returns a flatland width
@@ -19,8 +25,12 @@ public:
     unsigned int Height();
 
     // Checks if there is a live cell at the given spot
-    bool IsLive(unsigned int x, unsigned int y);
+    bool GetCell(unsigned int x, unsigned int y);
 
 private:
-
+    SimpleCellMap m_current;
 };
+
+}
+
+}
