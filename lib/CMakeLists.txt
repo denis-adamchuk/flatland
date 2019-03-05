@@ -6,7 +6,6 @@ set(SOURCES
 SimpleFlatland.cpp
 SimpleFlatland.h
 SimpleMapCreator.cpp
-SimpleMapCreator.h
-MapCreator.h)
+SimpleMapCreator.h)
 
 add_library(${LIB_NAME} STATIC ${SOURCES})

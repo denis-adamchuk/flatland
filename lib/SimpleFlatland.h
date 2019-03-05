@@ -19,16 +19,16 @@ public:
     void Run();
 
     // Returns a flatland width
-    unsigned int Width();
+    size_t Width() const;
 
     // Returns a flatland height
-    unsigned int Height();
+    size_t Height() const;
 
-    // Checks if there is a live cell at the given spot
-    bool GetCell(unsigned int x, unsigned int y);
+    // Checks if there is a live cell at the given spot (i - col, j - row)
+    bool GetCell(size_t i, size_t j) const;
 
 private:
-    SimpleCellMap m_current;
+    SimpleCellMap _current;
 };
 
 }

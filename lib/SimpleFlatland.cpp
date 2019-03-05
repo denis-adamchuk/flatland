@@ -1,5 +1,7 @@
 #include "SimpleFlatland.h"
 
+#include <stdexcept>
+
 namespace flatland
 {
 
@@ -7,31 +9,48 @@ namespace lib
 {
 
 SimpleFlatland::SimpleFlatland(const SimpleCellMap& flatlandMap)
+    : _current(flatlandMap)
 {
-    // TODO Not implemented
 }
 
 void SimpleFlatland::Run()
 {
-    // TODO Not implemented
+    SimpleCellMap nextGeneration(_current);
+    for (size_t j = 0; j < _current._dimensions._height; ++j)
+    {
+        for (size_t i = 0; i < _current._dimensions._width; ++i)
+        {
+            const auto current = ReadCell(_current, i, j);
+            const auto siblings =
+                ReadCell(_current, i - 1, j - 1) + ReadCell(_current, i    , j - 1) + ReadCell(_current, i + 1, j - 1)
+              + ReadCell(_current, i - 1, j    )                                    + ReadCell(_current, i + 1, j    )
+              + ReadCell(_current, i - 1, j + 1) + ReadCell(_current, i    , j + 1) + ReadCell(_current, i + 1, j + 1);
+
+            if (current && (siblings < 2 || siblings > 3))
+                WriteCell(nextGeneration, i, j, false);
+            else if (!current && siblings == 3)
+                WriteCell(nextGeneration, i, j, true);
+        }
+    }
+    std::swap(nextGeneration._map, _current._map);
 }
 
-unsigned int SimpleFlatland::Width()
+size_t SimpleFlatland::Width() const
 {
-    // TODO Not implemented
-    return 0;
+    return _current._dimensions._width;
 }
 
-unsigned int SimpleFlatland::Height()
+size_t SimpleFlatland::Height() const
 {
-    // TODO Not implemented
-    return 0;
+    return _current._dimensions._height;
 }
 
-bool SimpleFlatland::GetCell(unsigned int x, unsigned int y)
+bool SimpleFlatland::GetCell(size_t i, size_t j) const
 {
-    // TODO Not implemented
-    return false;
+    if (i >= _current._dimensions._width || j >= _current._dimensions._height)
+        throw std::range_error("Bad coordinate(s) passed");
+
+    return ReadCell(_current, i, j);
 }
 
 }

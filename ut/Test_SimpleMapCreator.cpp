@@ -14,33 +14,12 @@ SCENARIO("SimpleMapCreator tests", "Created world dimensions check")
 {
     const RandomDistributionWithoutLimits spec = { 17, 18 };
 
-    RandomSimpleMapCreator creator;
-    const auto simpleMap = creator.Create(spec);
+    const auto simpleMap = CreateSimpleMap(spec);
 
-    REQUIRE(simpleMap.size() == spec.width * spec.height);
+    REQUIRE(simpleMap._dimensions._height == spec._dimensions._height);
+    REQUIRE(simpleMap._dimensions._width == spec._dimensions._width);
+    REQUIRE(simpleMap._map.size() == spec._dimensions._width * spec._dimensions._height);
 }
-
-//SCENARIO("FlatlandCreator tests", "Created world content check")
-//{
-//    const SimpleSpec spec = { 17, 18, 25 };
-
-//    SimpleMapCreator creator;
-//    const auto simpleMap = creator.Create(spec);
-
-//    // TODO or invert loop?
-//    unsigned int liveCells = 0;
-//    for (unsigned int i = 0; i < height; ++i)
-//    {
-//        for (unsigned int j = 0; j < width; ++j)
-//        {
-//            if (simpleMap[i * width + j])
-//            {
-//                ++liveCells;
-//            }
-//        }
-//    }
-//    REQUIRE(liveCells == cells);
-//}
 
 }
 

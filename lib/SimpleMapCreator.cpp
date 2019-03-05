@@ -1,4 +1,3 @@
-#include "MapCreator.h"
 #include "SimpleMapCreator.h"
 
 #include <cstdlib>
@@ -10,19 +9,18 @@ namespace flatland
 namespace lib
 {
 
-template <>
-SimpleCellMap RandomSimpleMapCreator::Create(const RandomDistributionWithoutLimits& spec)
+SimpleCellMap CreateSimpleMap(const RandomDistributionWithoutLimits& spec)
 {
     std::srand(std::time(nullptr));
 
-    SimpleCellMap result;
-    result.resize(spec.width * spec.height);
+    SimpleCellMap result(spec._dimensions);
+    result._map.resize(spec._dimensions._width * spec._dimensions._height);
 
-    for (unsigned int i = 0; i < spec.height; ++i)
+    for (size_t j = 0; j < spec._dimensions._height; ++j)
     {
-        for (unsigned int j = 0; j < spec.width; ++j)
+        for (size_t i = 0; i < spec._dimensions._width; ++i)
         {
-            result[i * spec.width + j] = std::rand() % 2;
+            WriteCell(result, i, j, std::rand() % 2);
         }
     }
 
