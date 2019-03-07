@@ -1,4 +1,4 @@
-#include "../lib/SimpleFlatland.h"
+#include "lib/SimpleFlatland.h"
 
 #include <iostream>
 #include <chrono>

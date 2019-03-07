@@ -1,6 +1,6 @@
-#include "../lib/SimpleMapCreator.h"
+#include "lib/SimpleMapCreator.h"
 
-#include "../catch2/catch.hpp"
+#include "catch2/catch.hpp"
 
 namespace flatland
 {

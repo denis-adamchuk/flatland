@@ -1,6 +1,6 @@
-#include "../lib/SimpleFlatland.h"
+#include "lib/SimpleFlatland.h"
 
-#include "../catch2/catch.hpp"
+#include "catch2/catch.hpp"
 
 namespace flatland
 {

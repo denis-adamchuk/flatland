@@ -3,11 +3,11 @@ cmake_minimum_required(VERSION 3.0)
 set(APP_NAME flatland_ut)
 
 set(SOURCES
-main.cpp
-Test_SimpleFlatland.cpp
-Test_SimpleMapCreator.cpp)
-
-# TODO Add headers from dependent projects here
+	main.cpp
+	Test_SimpleFlatland.cpp
+	Test_SimpleMapCreator.cpp)
 
 add_executable(${APP_NAME} ${SOURCES})
 target_link_libraries(${APP_NAME} flatland_lib)
+target_include_directories(${APP_NAME}
+	PRIVATE ..)
