@@ -1,11 +1,13 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <QWidget>
+#include "lib/SimpleFlatland.h"
 
-#include <memory>
+#include <QWidget>
+#include <QSharedPointer>
 
 class RenderArea;
+class QTimer;
 
 class Window : public QWidget
 {
@@ -13,10 +15,18 @@ class Window : public QWidget
 
 public:
     Window(QWidget *parent = 0);
-    ~Window();
+
+public slots:
+    void plotNextGeneration();
+
+protected:
+    void wheelEvent(QWheelEvent* event) override;
+    void mousePressEvent(QMouseEvent* event) override;
 
 private:
-    std::unique_ptr<RenderArea> m_renderArea;
+    QSharedPointer<flatland::lib::SimpleFlatland> m_flatland;
+    RenderArea* m_renderArea;
+    QTimer* m_timer;
 };
 
 #endif // WINDOW_H

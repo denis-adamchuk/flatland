@@ -1,28 +1,31 @@
 #ifndef RENDERAREA_H
 #define RENDERAREA_H
 
-#include <QWidget>
-
 #include "lib/SimpleFlatland.h"
+
+#include <QWidget>
 
 class RenderArea : public QWidget
 {
     Q_OBJECT
 public:
-    explicit RenderArea(QWidget *parent, const QRect& rc);
+    explicit RenderArea(QWidget* parent, const QPoint& topLeft, const QSize size, int scale,
+                        QSharedPointer<flatland::lib::SimpleFlatland> flatland);
 
     QSize sizeHint() const override;
 
-protected:
-    void paintEvent(QPaintEvent *event) override;
+    void updateTopLeft(int x, int y);
+    void updateScale(bool increment);
 
 private:
-    flatland::lib::SimpleFlatland m_flatland;
+    QSize m_size;
+    QPoint m_relativeTopLeftPoint;
+    int m_scale;
+    QSharedPointer<flatland::lib::SimpleFlatland> m_flatland;
 
-signals:
+protected:
+    void paintEvent(QPaintEvent* event) override;
 
-public slots:
-    void plotNextGeneration();
 };
 
 #endif // RENDERAREA_H
