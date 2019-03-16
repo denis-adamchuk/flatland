@@ -8,13 +8,20 @@ QT       -= gui
 TEMPLATE = lib
 CONFIG += staticlib
 
+CONFIG += c++17
+
 HEADERS = \
    $$PWD/lib/SimpleFlatland.h \
-   $$PWD/lib/SimpleMapCreator.h
+   $$PWD/lib/SimpleMapCreator.h \
+    lib/AdvancedMapCreator.h \
+    lib/AdvancedFlatland.h \
+    lib/Common.h
 
 SOURCES = \
    $$PWD/lib/SimpleFlatland.cpp \
-   $$PWD/lib/SimpleMapCreator.cpp
+   $$PWD/lib/SimpleMapCreator.cpp \
+    lib/AdvancedMapCreator.cpp \
+    lib/AdvancedFlatland.cpp
 
 INCLUDEPATH = \
     $$PWD/lib

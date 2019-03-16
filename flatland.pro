@@ -4,4 +4,5 @@ SUBDIRS += \
     lib.pro \
     ut.pro \
     console.pro \
-    ui
+    ui.pro \
+    console2.pro

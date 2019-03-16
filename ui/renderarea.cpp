@@ -1,14 +1,47 @@
 #include "renderarea.h"
 
-#include "lib/SimpleMapCreator.h"
+#include "lib/AdvancedMapCreator.h"
+
+#include <QDebug>
+#include <QElapsedTimer>
 
 #include <QPainter>
 #include <QPen>
 
 #include <vector>
+#include <iostream>
+#include <fstream>
+
+namespace
+{
+    const QRgb sc_backgroundColor = qRgb(250, 250, 215);
+
+    QColor getColorByAge(unsigned long age, unsigned long maxAge)
+    {
+        int h = 0;
+        int s = 0;
+        int v = 0;
+
+             if (age > maxAge * 0.0 && age < maxAge * 0.2)
+            h = 120; // G
+        else if (age > maxAge * 0.2 && age < maxAge * 0.4)
+            h = 30;  // Orange
+        else if (age > maxAge * 0.4 && age < maxAge * 0.6)
+            h = 0;   // R
+        else if (age > maxAge * 0.6 && age < maxAge * 0.8)
+            h = 300; // Magenta
+        else if (age > maxAge * 0.8 && age < maxAge * 1.0)
+            h = 240; // B
+        const auto ageTo255 = static_cast<int>(255. * age / maxAge);
+        static const auto lowestV = 130;
+        s = v = std::max(lowestV, 255 - ageTo255);
+
+        return QColor::fromHsv(h, s, v);
+    }
+}
 
 RenderArea::RenderArea(QWidget *parent, const QPoint& topLeft, const QSize size, int scale,
-                       QSharedPointer<flatland::lib::SimpleFlatland> flatland)
+                       QSharedPointer<flatland::lib::AdvancedFlatland> flatland)
     : QWidget(parent)
     , m_size(size)
     , m_relativeTopLeftPoint(topLeft)
@@ -22,16 +55,31 @@ QSize RenderArea::sizeHint() const
     return m_size;
 }
 
-void RenderArea::paintEvent(QPaintEvent * /* event */)
+void RenderArea::doPaint()
 {
-    std::vector<QPoint> blackPoints;
-    blackPoints.reserve(static_cast<size_t>(m_size.width() * m_size.height()));
+    QPainter painter(this);
 
-    for (size_t i = 0; i < m_flatland->Width(); ++i)
+    const QRect rc(0, 0, m_size.width(), m_size.height());
+    painter.fillRect(rc, sc_backgroundColor);
+
+    const auto& stat = m_flatland->GetStatistics();
+
+    painter.setPen(Qt::red);
+    painter.drawText(QPoint{10, 20}, QString("generation: %1").
+        arg(stat._generation));
+    painter.drawText(QPoint{10, 40}, QString("alive cells: %1 (%2%3)").
+        arg(QString::number(stat._aliveCells),
+            (stat._aliveCellsDelta > 0 ? "+" : "-"), QString::number(stat._aliveCellsDelta)));
+    painter.drawText(QPoint{10, 60}, QString("reproductive cells: %1 (%2%3)").
+        arg(QString::number(stat._reproductiveCells),
+            (stat._reproductiveCellsDelta > 0 ? "+" : "-"), QString::number(stat._reproductiveCellsDelta)));
+
+    for (size_t j = 0; j < m_flatland->Height(); ++j)
     {
-        for (size_t j = 0; j < m_flatland->Height(); ++j)
+        for (size_t i = 0; i < m_flatland->Width(); ++i)
         {
-            if (m_flatland->GetCell(i, j))
+            const auto& age = m_flatland->GetCell(i, j)._age;
+            if (age > 0)
             {
                 const auto cellX = static_cast<int>(i);
                 const auto cellY = static_cast<int>(j);
@@ -45,26 +93,24 @@ void RenderArea::paintEvent(QPaintEvent * /* event */)
                 if (scaledCellX >= 0 && scaledCellX < m_size.width() &&
                     scaledCellY >= 0 && scaledCellY < m_size.height())
                 {
+                    const auto color = getColorByAge(age, m_flatland->GetMaxAge());
+                    painter.setPen(color);
                     for (int sX = 0; sX < m_scale; ++sX)
                     {
                         for (int sY = 0; sY < m_scale; ++sY)
                         {
-                            blackPoints.emplace_back(scaledCellX + sX, scaledCellY + sY);
+                            painter.drawPoint(scaledCellX + sX, scaledCellY + sY);
                         }
                     }
                 }
             }
         }
     }
+}
 
-    QPainter painter(this);
-    painter.setRenderHint(QPainter::RenderHint::Antialiasing);
-
-    const QRect rc(0, 0, m_size.width(), m_size.height());
-    painter.fillRect(rc, Qt::white);
-
-    painter.setPen(Qt::black);
-    painter.drawPoints(blackPoints.data(), static_cast<int>(blackPoints.size()));
+void RenderArea::paintEvent(QPaintEvent * /* event */)
+{
+    doPaint();
 }
 
 void RenderArea::updateTopLeft(int x, int y)
@@ -84,7 +130,7 @@ void RenderArea::updateTopLeft(int x, int y)
 
 void RenderArea::updateScale(bool increment)
 {
-    if (increment && m_scale < 16)
+    if (increment && m_scale < 32)
     {
         m_scale *= 2;
     }

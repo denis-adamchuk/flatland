@@ -3,6 +3,7 @@
 #include "renderarea.h"
 
 #include <QDebug>
+#include <QElapsedTimer>
 
 #include <QTimer>
 #include <QScreen>
@@ -18,16 +19,21 @@ const int sc_minTimerInterval = 1;
 const int sc_maxTimerInterval = 1000;
 const int sc_defaultTimerInterval = 200;
 
-const size_t sc_defaultFlatlandWidth = 1000;
-const size_t sc_defaultFlatlandHeight = 1000;
+const unsigned long sc_defaultMaxAge = 1000;
+const unsigned long sc_defaultMaxReproductivityAge = 750;
 
 }
 
 Window::Window(QWidget *parent)
     : QWidget(parent)
-    , m_flatland(new flatland::lib::SimpleFlatland(flatland::lib::CreateSimpleMap(
-        {{ sc_defaultFlatlandWidth, sc_defaultFlatlandHeight }})))
-    , m_renderArea(new RenderArea(this, QPoint(0, 0), QGuiApplication::screens().front()->size(), 1, m_flatland))
+    , m_flatland(new flatland::lib::AdvancedFlatland(flatland::lib::CreateAdvancedMap(
+        {{ static_cast<size_t>(QGuiApplication::screens().front()->size().width()),
+           static_cast<size_t>(QGuiApplication::screens().front()->size().height())}}),
+        sc_defaultMaxAge, sc_defaultMaxReproductivityAge))
+    , m_renderArea(new RenderArea(this, QPoint(0, 0),
+                                  QGuiApplication::screens().front()->size(),
+                                  1,
+                                  m_flatland))
     , m_timer(new QTimer(this))
 {
     setWindowTitle("Flatland for QT");

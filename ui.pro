@@ -22,16 +22,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-CONFIG += c++14
+CONFIG += c++17
 
 SOURCES += \
-        main.cpp \
-        window.cpp \
-    renderarea.cpp
+        $$PWD/ui/main.cpp \
+        $$PWD/ui/window.cpp \
+        $$PWD/ui/renderarea.cpp
 
 HEADERS += \
-        window.h \
-    renderarea.h
+        $$PWD/ui/window.h \
+        $$PWD/ui/renderarea.h
 
 CONFIG += mobility
 MOBILITY = 

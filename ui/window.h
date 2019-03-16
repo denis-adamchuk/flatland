@@ -1,7 +1,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "lib/SimpleFlatland.h"
+#include "lib/AdvancedFlatland.h"
 
 #include <QWidget>
 #include <QSharedPointer>
@@ -24,7 +24,7 @@ protected:
     void mousePressEvent(QMouseEvent* event) override;
 
 private:
-    QSharedPointer<flatland::lib::SimpleFlatland> m_flatland;
+    QSharedPointer<flatland::lib::AdvancedFlatland> m_flatland;
     RenderArea* m_renderArea;
     QTimer* m_timer;
 };

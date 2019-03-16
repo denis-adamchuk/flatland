@@ -1,7 +1,9 @@
-#include "SimpleMapCreator.h"
+#include "AdvancedMapCreator.h"
 
+#include <optional>
 #include <cstdlib>
 #include <ctime>
+#include <cmath>
 
 namespace flatland
 {
@@ -9,18 +11,22 @@ namespace flatland
 namespace lib
 {
 
-SimpleCellMap CreateSimpleMap(const RandomDistributionWithoutLimits& spec)
+AdvancedCellMap CreateAdvancedMap(const RandomDistributionWithoutLimits& spec)
 {
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
-    SimpleCellMap result(spec._dimensions);
+    AdvancedCellMap result(spec._dimensions);
     result._map.resize(spec._dimensions._width * spec._dimensions._height);
 
     for (size_t j = 0; j < spec._dimensions._height; ++j)
     {
         for (size_t i = 0; i < spec._dimensions._width; ++i)
         {
-            WriteCell(result, i, j, std::rand() % 2);
+            if (std::rand() % 2)
+            {
+                const AdvancedCell cell = { 1 };
+                WriteCell(result, i, j, cell);
+            }
         }
     }
 
