@@ -14,7 +14,7 @@ class Window : public QWidget
     Q_OBJECT
 
 public:
-    Window(QWidget *parent = 0);
+    Window(QWidget *parent, unsigned long maxAge, unsigned long maxReproductivityAge);
 
 public slots:
     void plotNextGeneration();

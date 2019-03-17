@@ -16,7 +16,7 @@ HEADERS = \
    $$PWD/lib/SimpleMapCreator.h
 
 SOURCES = \
-   $$PWD/ut/main.cpp \
+   $$PWD/ut/main_ut.cpp \
    $$PWD/ut/Test_SimpleFlatland.cpp \
    $$PWD/ut/Test_SimpleMapCreator.cpp \
    $$PWD/lib/SimpleFlatland.cpp \

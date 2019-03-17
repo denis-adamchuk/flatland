@@ -1,6 +1,7 @@
 #include "AdvancedFlatland.h"
 
 #include <stdexcept>
+#include <cassert>
 
 namespace flatland
 {
@@ -10,7 +11,10 @@ namespace lib
 
 AdvancedFlatland::AdvancedFlatland(const AdvancedCellMap& flatlandMap, unsigned long maxAge,
     unsigned long maxReproductivityAge)
-    : _currentGeneration(flatlandMap), _maxAge(maxAge), _maxReproductivityAge(maxReproductivityAge)
+    : _currentGeneration(flatlandMap)
+    , _maxAge(maxAge)
+    , _maxReproductivityAge(maxReproductivityAge)
+    , _loopDetectionStep(0)
 {
     _lastStatSnapshot._aliveCells = 0;
     _lastStatSnapshot._reproductiveCells = 0;
@@ -28,8 +32,75 @@ AdvancedFlatland::AdvancedFlatland(const AdvancedCellMap& flatlandMap, unsigned 
 
     _lastStatSnapshot._aliveCellsDelta = static_cast<signed long>(_lastStatSnapshot._aliveCells);
     _lastStatSnapshot._reproductiveCellsDelta = static_cast<signed long>(_lastStatSnapshot._reproductiveCells);
-
     _lastStatSnapshot._generation = 0; // start
+
+    _minAliveCellsCount = _lastStatSnapshot._aliveCells;;
+    _prevMinAliveCellsCount = _minAliveCellsCount;
+}
+
+void AdvancedFlatland::detectLoop()
+{
+    if (!_lastStatSnapshot._loopDetected)
+    {
+        if (_prevMinAliveCellsCount != _minAliveCellsCount)
+        {
+            _prevMinAliveCellsCount = _minAliveCellsCount;
+
+            _loopDetectionQueue = decltype(_loopDetectionQueue)();
+            _loopDetectionStep = 0;
+        }
+
+        if (_lastStatSnapshot._aliveCells == _minAliveCellsCount)
+        {
+            if (_loopDetectionStep == 0)
+            {
+                _loopDetectionStep = 1;
+            }
+            else if (_loopDetectionStep == 1)
+            {
+                _loopDetectionStep = 2;
+            }
+            else if (_loopDetectionStep == 2)
+            {
+                if (_loopDetectionQueue.empty())
+                {
+                    _lastStatSnapshot._loopDetected = true;
+                }
+                else
+                {
+                    _loopDetectionQueue = decltype(_loopDetectionQueue)();
+                    _loopDetectionStep = 0;
+                }
+            }
+        }
+        else
+        {
+            if (_loopDetectionStep == 0)
+            {
+                ;
+            }
+            else if (_loopDetectionStep == 1)
+            {
+                _loopDetectionQueue.push(_lastStatSnapshot._aliveCells);
+            }
+            else if (_loopDetectionStep == 2)
+            {
+                if (_loopDetectionQueue.empty())
+                {
+                    _loopDetectionStep = 0;
+                }
+                else if (_loopDetectionQueue.front() == _lastStatSnapshot._aliveCells)
+                {
+                    _loopDetectionQueue.pop();
+                }
+                else
+                {
+                    _loopDetectionQueue = decltype(_loopDetectionQueue)();
+                    _loopDetectionStep = 0;
+                }
+            }
+        }
+    }
 }
 
 void AdvancedFlatland::Run()
@@ -70,9 +141,15 @@ void AdvancedFlatland::Run()
 
     _lastStatSnapshot._aliveCellsDelta =
         static_cast<signed long>(aliveCells - _lastStatSnapshot._aliveCells);
+    _lastStatSnapshot._aliveCells = aliveCells;
     _lastStatSnapshot._reproductiveCellsDelta =
         static_cast<signed long>(reproductiveCells - _lastStatSnapshot._reproductiveCells);
+    _lastStatSnapshot._reproductiveCells = reproductiveCells;
+    if (aliveCells < _minAliveCellsCount)
+        _minAliveCellsCount = aliveCells;
     ++_lastStatSnapshot._generation;
+
+    detectLoop();
 }
 
 size_t AdvancedFlatland::Width() const

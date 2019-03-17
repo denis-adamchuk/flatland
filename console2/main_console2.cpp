@@ -3,13 +3,14 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <queue>
 
 using namespace flatland;
 using namespace flatland::lib;
 
 int main(int argc, char* argv[])
 {
-    if (argc < 4)
+    if (argc < 5)
     {
         std::cout << "Use: console2 <Width> <Height> <MaxAge> <MaxReproductivityAge>";
         return -1;
@@ -33,10 +34,12 @@ int main(int argc, char* argv[])
         const auto& stat = flatland.GetStatistics();
 
         std::cout
-            << "\rGeneration: " << stat._generation
+            << "Generation: " << stat._generation
             << " Alive cells: " << stat._aliveCells
             << " Reproductive cells: " << stat._reproductiveCells
-            << std::endl;
+            << (stat._loopDetected ? " [LOOP]" : "")
+            << "\n";
+        std::cout.flush();
 
         if (stat._aliveCells <= 0)
         {
@@ -50,9 +53,16 @@ int main(int argc, char* argv[])
             break;
         }
 
-        static const unsigned long sc_delay = 20; // ms
-        std::this_thread::sleep_for(std::chrono::milliseconds(sc_delay));
+//        static const unsigned long sc_delay = 20; // ms
+//        std::this_thread::sleep_for(std::chrono::milliseconds(sc_delay));
     }
+
+    std::cout << std::endl;
+    std::cout
+        << "G: " << flatland.GetStatistics()._generation
+        << " -- " << width << "x" << height
+        << " " << maxAge << "(" << maxReproductivityAge << ")"
+        << std::endl;
 
     return 0;
 }

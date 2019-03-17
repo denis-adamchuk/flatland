@@ -19,17 +19,14 @@ const int sc_minTimerInterval = 1;
 const int sc_maxTimerInterval = 1000;
 const int sc_defaultTimerInterval = 200;
 
-const unsigned long sc_defaultMaxAge = 1000;
-const unsigned long sc_defaultMaxReproductivityAge = 750;
-
 }
 
-Window::Window(QWidget *parent)
+Window::Window(QWidget *parent, unsigned long maxAge, unsigned long maxReproductivityAge)
     : QWidget(parent)
     , m_flatland(new flatland::lib::AdvancedFlatland(flatland::lib::CreateAdvancedMap(
         {{ static_cast<size_t>(QGuiApplication::screens().front()->size().width()),
            static_cast<size_t>(QGuiApplication::screens().front()->size().height())}}),
-        sc_defaultMaxAge, sc_defaultMaxReproductivityAge))
+        maxAge, maxReproductivityAge))
     , m_renderArea(new RenderArea(this, QPoint(0, 0),
                                   QGuiApplication::screens().front()->size(),
                                   1,
@@ -61,13 +58,13 @@ void Window::mousePressEvent(QMouseEvent* event)
 {
     if (event->button() & Qt::LeftButton)
     {
-        m_renderArea->updateScale(true);
+        //m_renderArea->updateScale(true);
         m_renderArea->updateTopLeft(event->x(), event->y());
         m_renderArea->update();
     }
     else if (event->button() & Qt::RightButton)
     {
-        m_renderArea->updateScale(false);
+        //m_renderArea->updateScale(false);
         m_renderArea->updateTopLeft(event->x(), event->y());
         m_renderArea->update();
     }

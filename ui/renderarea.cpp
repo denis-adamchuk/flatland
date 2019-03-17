@@ -65,14 +65,14 @@ void RenderArea::doPaint()
     const auto& stat = m_flatland->GetStatistics();
 
     painter.setPen(Qt::red);
-    painter.drawText(QPoint{10, 20}, QString("generation: %1").
-        arg(stat._generation));
+    painter.drawText(QPoint{10, 20}, QString("generation: %1").arg(stat._generation));
     painter.drawText(QPoint{10, 40}, QString("alive cells: %1 (%2%3)").
         arg(QString::number(stat._aliveCells),
             (stat._aliveCellsDelta > 0 ? "+" : "-"), QString::number(stat._aliveCellsDelta)));
     painter.drawText(QPoint{10, 60}, QString("reproductive cells: %1 (%2%3)").
         arg(QString::number(stat._reproductiveCells),
             (stat._reproductiveCellsDelta > 0 ? "+" : "-"), QString::number(stat._reproductiveCellsDelta)));
+    painter.drawText(QPoint{10, 80}, QString("loop: %1").arg((stat._loopDetected ? "Yes" : "No")));
 
     for (size_t j = 0; j < m_flatland->Height(); ++j)
     {

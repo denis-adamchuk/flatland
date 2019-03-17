@@ -10,7 +10,7 @@ TEMPLATE = app
 HEADERS =
 
 SOURCES = \
-   $$PWD/console/main.cpp
+   $$PWD/console/main_console.cpp
 
 INCLUDEPATH =
 

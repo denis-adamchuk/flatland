@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 set(APP_NAME flatland_ut)
 
 set(SOURCES
-	main.cpp
+	main_ut.cpp
 	Test_SimpleFlatland.cpp
 	Test_SimpleMapCreator.cpp)
 
