@@ -22,12 +22,6 @@ SOURCES = \
    $$PWD/lib/SimpleFlatland.cpp \
    $$PWD/lib/SimpleMapCreator.cpp
 
-
-INCLUDEPATH =
-
-#DEFINES = 
-
-
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/./release/ -llib
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/./debug/ -llib
 else:unix: LIBS += -L$$OUT_PWD/./ -llib

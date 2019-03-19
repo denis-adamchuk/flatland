@@ -18,6 +18,7 @@ template <typename TMapElement>
 struct FlatlandMap
 {
     typedef TMapElement value_type;
+    typedef typename std::vector<TMapElement>::const_reference const_reference;
 
     const MapDimensions _dimensions;
     std::vector<TMapElement> _map;
@@ -35,7 +36,7 @@ void WriteCell(TMap& map, size_t i, size_t j, const typename TMap::value_type& v
 }
 
 template <typename TMap>
-const typename TMap::value_type& ReadCell(const TMap& map, size_t i, size_t j)
+const typename TMap::const_reference ReadCell(const TMap& map, size_t i, size_t j)
 {
     static const typename TMap::value_type sc_dummy{};
     if (i >= map._dimensions._width || j >= map._dimensions._height)

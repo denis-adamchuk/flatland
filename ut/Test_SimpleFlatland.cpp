@@ -190,7 +190,54 @@ SCENARIO("Flatland world next generation -- metamorphosis")
 
     REQUIRE(!!(flatland == refFlatland));
 }
+/*
+SCENARIO("Flatland world next generation -- metamorphosis 2")
+{
+    const auto simpleMap = CreateDummyMap({
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 },
+        { 0, 1, 0, 0, 0, 0, 1, 0, 0, 0 },
+        { 0, 1, 0, 0, 0, 0, 1, 0, 0, 0 },
+        { 0, 1, 0, 0, 0, 0, 1, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+    });
+    SimpleFlatland flatland(simpleMap);
 
+    flatland.Run();
+
+    const auto refMap1 = CreateDummyMap({
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 1, 1, 0, 0, 0, 0 },
+        { 0, 0, 1, 0, 1, 0, 1, 0, 0, 0 },
+        { 1, 1, 1, 0, 0, 1, 1, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 1, 1, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 1, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 1, 0, 0, 0, 0, 0 }
+    });
+    SimpleFlatland refFlatland1(refMap1);
+
+    REQUIRE(!!(flatland == refFlatland1));
+
+    const auto refMap2 = CreateDummyMap({
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 },
+        { 0, 0, 1, 0, 1, 0, 1, 0, 0, 0 },
+        { 0, 1, 1, 1, 0, 1, 1, 0, 0, 0 },
+        { 0, 1, 0, 0, 1, 0, 1, 0, 0, 0 },
+        { 0, 0, 0, 0, 1, 1, 0, 0, 0, 0 },
+        { 0, 0, 0, 1, 1, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+    });
+    SimpleFlatland refFlatland2(refMap2);
+
+    flatland.Run();
+
+    REQUIRE(!!(flatland == refFlatland2));
+}
+*/
 }
 
 }

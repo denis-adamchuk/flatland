@@ -14,7 +14,8 @@ class Window : public QWidget
     Q_OBJECT
 
 public:
-    Window(QWidget *parent, unsigned long maxAge, unsigned long maxReproductivityAge);
+    Window(QWidget *parent, unsigned long width, unsigned long height,
+           unsigned long maxAge, unsigned long maxReproductivityAge);
 
 public slots:
     void plotNextGeneration();
@@ -22,6 +23,7 @@ public slots:
 protected:
     void wheelEvent(QWheelEvent* event) override;
     void mousePressEvent(QMouseEvent* event) override;
+    void keyPressEvent(QKeyEvent* event) override;
 
 private:
     QSharedPointer<flatland::lib::AdvancedFlatland> m_flatland;

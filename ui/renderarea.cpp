@@ -84,14 +84,11 @@ void RenderArea::doPaint()
                 const auto cellX = static_cast<int>(i);
                 const auto cellY = static_cast<int>(j);
 
-                const auto cellRelativeX = cellX - m_relativeTopLeftPoint.x();
-                const auto cellRelativeY = cellY - m_relativeTopLeftPoint.y();
+                const auto cellRelativeX = cellX * m_scale - m_relativeTopLeftPoint.x();
+                const auto cellRelativeY = cellY * m_scale - m_relativeTopLeftPoint.y();
 
-                const auto scaledCellX = cellRelativeX * m_scale;
-                const auto scaledCellY = cellRelativeY * m_scale;
-
-                if (scaledCellX >= 0 && scaledCellX < m_size.width() &&
-                    scaledCellY >= 0 && scaledCellY < m_size.height())
+                if (cellRelativeX >= 0 && cellRelativeX < m_size.width() &&
+                    cellRelativeY >= 0 && cellRelativeY < m_size.height())
                 {
                     const auto color = getColorByAge(age, m_flatland->GetMaxAge());
                     painter.setPen(color);
@@ -99,7 +96,7 @@ void RenderArea::doPaint()
                     {
                         for (int sY = 0; sY < m_scale; ++sY)
                         {
-                            painter.drawPoint(scaledCellX + sX, scaledCellY + sY);
+                            painter.drawPoint(cellRelativeX + sX, cellRelativeY + sY);
                         }
                     }
                 }

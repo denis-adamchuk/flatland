@@ -15,13 +15,15 @@ HEADERS = \
    $$PWD/lib/SimpleMapCreator.h \
     lib/AdvancedMapCreator.h \
     lib/AdvancedFlatland.h \
-    lib/Common.h
+    lib/Common.h \
+    lib/CycleFinder.h
 
 SOURCES = \
    $$PWD/lib/SimpleFlatland.cpp \
    $$PWD/lib/SimpleMapCreator.cpp \
     lib/AdvancedMapCreator.cpp \
-    lib/AdvancedFlatland.cpp
+    lib/AdvancedFlatland.cpp \
+    lib/CycleFinder.cpp
 
 INCLUDEPATH = \
     $$PWD/lib

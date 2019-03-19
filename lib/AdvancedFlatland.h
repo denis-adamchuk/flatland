@@ -1,8 +1,7 @@
 #pragma once
 
 #include "AdvancedMapCreator.h"
-
-#include <queue>
+#include "CycleFinder.h"
 
 namespace flatland
 {
@@ -48,18 +47,13 @@ public:
 private:
     bool isAliveCell(size_t i, size_t j) const;
     bool isReproductiveCell(size_t i, size_t j) const;
-    void detectLoop();
 
 private:
     AdvancedCellMap _currentGeneration;
     Statistics _lastStatSnapshot;
     unsigned long _maxAge;
     unsigned long _maxReproductivityAge;
-
-    std::queue<unsigned long> _loopDetectionQueue;
-    unsigned char _loopDetectionStep;
-    unsigned long _minAliveCellsCount;
-    unsigned long _prevMinAliveCellsCount;
+    CycleFinder _cycleFinder;
 };
 
 }

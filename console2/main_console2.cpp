@@ -52,9 +52,6 @@ int main(int argc, char* argv[])
         {
             break;
         }
-
-//        static const unsigned long sc_delay = 20; // ms
-//        std::this_thread::sleep_for(std::chrono::milliseconds(sc_delay));
     }
 
     std::cout << std::endl;

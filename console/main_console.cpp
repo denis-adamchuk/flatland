@@ -7,7 +7,7 @@
 using namespace flatland;
 using namespace flatland::lib;
 
-int main(int argc, char* argv[])
+int main(int, char*[])
 {
     size_t width;
     std::cout << "World width: ";
