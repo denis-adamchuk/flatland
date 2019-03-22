@@ -33,7 +33,7 @@ bool operator ==(const SimpleFlatland& lhs, const SimpleFlatland& rhs)
     {
         for (size_t i = 0; i < lhs.Width(); ++i)
         {
-            if (lhs.GetCell(i, j) != rhs.GetCell(i, j))
+            if (lhs.IsCellAlive(i, j) != rhs.IsCellAlive(i, j))
                 return false;
         }
     }
@@ -51,10 +51,10 @@ SCENARIO("Flatland world original dimensions check")
 
     REQUIRE(flatland.Width() == 2);
     REQUIRE(flatland.Height() == 2);
-    REQUIRE(flatland.GetCell(0, 0));
-    REQUIRE(flatland.GetCell(0, 1));
-    REQUIRE_FALSE(flatland.GetCell(1, 0));
-    REQUIRE_FALSE(flatland.GetCell(1, 1));
+    REQUIRE(flatland.IsCellAlive(0, 0));
+    REQUIRE(flatland.IsCellAlive(0, 1));
+    REQUIRE_FALSE(flatland.IsCellAlive(1, 0));
+    REQUIRE_FALSE(flatland.IsCellAlive(1, 1));
 }
 
 SCENARIO("Flatland throws on bad coordinates")
@@ -62,7 +62,7 @@ SCENARIO("Flatland throws on bad coordinates")
     const auto simpleMap = CreateDummyMap({{ 1 }});
     SimpleFlatland flatland(simpleMap);
 
-    REQUIRE_THROWS_WITH(flatland.GetCell(1, 1), "Bad coordinate(s) passed");
+    REQUIRE_THROWS_WITH(flatland.IsCellAlive(1, 1), "Bad coordinate(s) passed");
 }
 
 SCENARIO("Flatland world next generation dimensions check")

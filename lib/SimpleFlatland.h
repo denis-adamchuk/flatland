@@ -1,6 +1,8 @@
 #pragma once
 
 #include "SimpleMapCreator.h"
+#include "CycleFinder.h"
+#include "Statistics.h"
 
 namespace flatland
 {
@@ -25,10 +27,18 @@ public:
     size_t Height() const;
 
     // Checks if there is a live cell at the given spot (i - col, j - row)
-    bool GetCell(size_t i, size_t j) const;
+    bool IsCellAlive(size_t i, size_t j) const;
+
+    // Gather cell statistics
+    const Statistics& GetStatistics() const;
 
 private:
-    SimpleCellMap _current;
+    bool isAliveCell(size_t i, size_t j) const;
+
+private:
+    SimpleCellMap _currentGeneration;
+    Statistics _lastStatSnapshot;
+    CycleFinder _cycleFinder;
 };
 
 }

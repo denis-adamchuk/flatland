@@ -1,5 +1,11 @@
 #include "CycleFinder.h"
 
+namespace flatland
+{
+
+namespace lib
+{
+
 CycleFinder::CycleFinder(unsigned long maxCycleLength, unsigned long confirmationCount)
     : _maxCycleLength(maxCycleLength)
     , _confirmationCount(confirmationCount)
@@ -8,16 +14,14 @@ CycleFinder::CycleFinder(unsigned long maxCycleLength, unsigned long confirmatio
 {
 }
 
-bool CycleFinder::Apply(unsigned long item)
+void CycleFinder::Apply(unsigned long item)
 {
     if (_window.size() < _windowSize)
     {
         _window.push_back(item);
-    }
 
-    if (_window.size() < _windowSize)
-    {
-        return false;
+        if (_window.size() < _windowSize)
+            return;
     }
 
     long shift = 1;
@@ -47,6 +51,7 @@ bool CycleFinder::Apply(unsigned long item)
                 if (!same)
                     _cycles = 0;
             }
+
             ++_cycles;
             shift = static_cast<long>(iCycleLengthToCheck);
             _cycle.assign(_window.begin(), _window.begin() + shift);
@@ -55,10 +60,17 @@ bool CycleFinder::Apply(unsigned long item)
     }
 
     if (_cycles >= _confirmationCount)
-        return true;
+        return;
 
     for (size_t iSkip = 0; iSkip < static_cast<size_t>(shift); ++iSkip)
         _window.pop_front();
+}
 
-    return false;
+bool CycleFinder::HasCycle()
+{
+    return _cycles >= _confirmationCount;
+}
+
+}
+
 }

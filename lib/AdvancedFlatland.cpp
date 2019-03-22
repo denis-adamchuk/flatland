@@ -1,13 +1,7 @@
 #include "AdvancedFlatland.h"
+#include "Common.h"
 
 #include <stdexcept>
-#include <cassert>
-
-namespace
-{
-    const size_t sc_maxCycleLength{ 10 };
-    const size_t sc_cyclesConfirmationCount{ 5 };
-}
 
 namespace flatland
 {
@@ -20,11 +14,7 @@ AdvancedFlatland::AdvancedFlatland(const AdvancedCellMap& flatlandMap, unsigned 
     : _currentGeneration(flatlandMap)
     , _maxAge(maxAge)
     , _maxReproductivityAge(maxReproductivityAge)
-    , _cycleFinder(sc_maxCycleLength, sc_cyclesConfirmationCount)
 {
-    _lastStatSnapshot._aliveCells = 0;
-    _lastStatSnapshot._reproductiveCells = 0;
-
     for (size_t j = 0; j < _currentGeneration._dimensions._height; ++j)
     {
         for (size_t i = 0; i < _currentGeneration._dimensions._width; ++i)
@@ -43,6 +33,8 @@ AdvancedFlatland::AdvancedFlatland(const AdvancedCellMap& flatlandMap, unsigned 
 
 void AdvancedFlatland::Run()
 {
+    using namespace std::placeholders;
+
     unsigned long aliveCells = 0;
     unsigned long reproductiveCells = 0;
 
@@ -52,14 +44,16 @@ void AdvancedFlatland::Run()
         for (size_t i = 0; i < _currentGeneration._dimensions._width; ++i)
         {
             const auto current = ReadCell(_currentGeneration, i, j);
-            const auto siblings =
-                isAliveCell(i - 1, j - 1) + isAliveCell(i, j - 1) + isAliveCell(i + 1, j - 1)
-              + isAliveCell(i - 1, j)                             + isAliveCell(i + 1, j)
-              + isAliveCell(i - 1, j + 1) + isAliveCell(i, j + 1) + isAliveCell(i + 1, j + 1);
-            const auto reproductiveSiblings =
-                isReproductiveCell(i - 1, j - 1) + isReproductiveCell(i, j - 1) + isReproductiveCell(i + 1, j - 1)
-              + isReproductiveCell(i - 1, j)                                    + isReproductiveCell(i + 1, j)
-              + isReproductiveCell(i - 1, j + 1) + isReproductiveCell(i, j + 1) + isReproductiveCell(i + 1, j + 1);
+            const auto siblings = CountSiblings(i, j,
+                [this](size_t i, size_t j)
+            {
+                return isAliveCell(i, j);
+            });
+            const auto reproductiveSiblings = CountSiblings(i, j,
+                [this](size_t i, size_t j)
+            {
+                return isReproductiveCell(i, j);
+            });
 
             if (current._age + 1 >= _maxAge)
                 WriteCell(nextGeneration, i, j, { 0 });
@@ -84,8 +78,6 @@ void AdvancedFlatland::Run()
         static_cast<signed long>(reproductiveCells - _lastStatSnapshot._reproductiveCells);
     _lastStatSnapshot._reproductiveCells = reproductiveCells;
     ++_lastStatSnapshot._generation;
-    if (!_lastStatSnapshot._loopDetected)
-        _lastStatSnapshot._loopDetected = _cycleFinder.Apply(aliveCells);
 }
 
 size_t AdvancedFlatland::Width() const
@@ -98,12 +90,17 @@ size_t AdvancedFlatland::Height() const
     return _currentGeneration._dimensions._height;
 }
 
-const AdvancedCell& AdvancedFlatland::GetCell(size_t i, size_t j) const
+bool AdvancedFlatland::IsCellAlive(size_t i, size_t j) const
+{
+    return GetCellAge(i, j) > 0;
+}
+
+unsigned long AdvancedFlatland::GetCellAge(size_t i, size_t j) const
 {
     if (i >= _currentGeneration._dimensions._width || j >= _currentGeneration._dimensions._height)
         throw std::range_error("Bad coordinate(s) passed");
 
-    return ReadCell(_currentGeneration, i, j);
+    return ReadCell(_currentGeneration, i, j)._age;
 }
 
 unsigned long AdvancedFlatland::GetMaxAge() const
@@ -111,7 +108,7 @@ unsigned long AdvancedFlatland::GetMaxAge() const
     return _maxAge;
 }
 
-const AdvancedFlatland::Statistics& AdvancedFlatland::GetStatistics() const
+const AdvancedStatistics& AdvancedFlatland::GetStatistics() const
 {
     return _lastStatSnapshot;
 }

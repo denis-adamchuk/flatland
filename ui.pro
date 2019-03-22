@@ -26,12 +26,14 @@ CONFIG += c++17
 
 SOURCES += \
         $$PWD/ui/main_ui.cpp \
-        $$PWD/ui/window.cpp \
-        $$PWD/ui/renderarea.cpp
+        $$PWD/ui/window.inl \
+    	$$PWD/ui/renderarea.inl \
+    	$$PWD/ui/ui_helpers.cpp
 
 HEADERS += \
         $$PWD/ui/window.h \
-        $$PWD/ui/renderarea.h
+        $$PWD/ui/renderarea.h \
+    	$$PWD/ui/ui_helpers.h
 
 CONFIG += mobility
 MOBILITY = 

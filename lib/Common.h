@@ -1,6 +1,13 @@
 #pragma once
 
 #include <vector>
+#include <functional>
+
+namespace flatland
+{
+
+namespace lib
+{
 
 struct MapDimensions
 {
@@ -43,4 +50,17 @@ const typename TMap::const_reference ReadCell(const TMap& map, size_t i, size_t 
         return sc_dummy; // a border of the world
 
     return map._map[j * map._dimensions._width + i];
+}
+
+template <typename TFnCheck>
+unsigned long CountSiblings(size_t i, size_t j, const TFnCheck& fn)
+{
+    return
+        fn(i - 1, j - 1) + fn(i, j - 1) + fn(i + 1, j - 1)
+      + fn(i - 1, j)                    + fn(i + 1, j)
+      + fn(i - 1, j + 1) + fn(i, j + 1) + fn(i + 1, j + 1);
+}
+
+}
+
 }

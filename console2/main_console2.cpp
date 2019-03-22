@@ -1,3 +1,4 @@
+#include "lib/SimpleFlatland.h"
 #include "lib/AdvancedFlatland.h"
 
 #include <iostream>
@@ -8,58 +9,72 @@
 using namespace flatland;
 using namespace flatland::lib;
 
+void printStatistics(const SimpleFlatland& flatland)
+{
+    const auto& stat = flatland.GetStatistics();
+    std::cout
+        << "Generation: " << stat._generation
+        << " Alive cells: " << stat._aliveCells
+        << (stat._loopDetected ? " [LOOP]" : "")
+        << "\n";
+    std::cout.flush();
+}
+
+void printStatistics(const AdvancedFlatland& flatland)
+{
+    const auto& stat = flatland.GetStatistics();
+    std::cout
+        << "Generation: " << stat._generation
+        << " Alive cells: " << stat._aliveCells
+        << " Reproductive cells: " << stat._reproductiveCells
+        << "\n";
+    std::cout.flush();
+}
+
+template <typename TFlatland>
+void run(TFlatland&& flatland)
+{
+    const auto& stat = flatland.GetStatistics();
+    while (stat._aliveCells > 0)
+    {
+        printStatistics(flatland);
+        flatland.Run();
+    }
+}
+
 int main(int argc, char* argv[])
 {
-    if (argc < 5)
+    if (argc < 3)
     {
-        std::cout << "Use: console2 <Width> <Height> <MaxAge> <MaxReproductivityAge>";
+        std::cout << "Use: console2 <Width> <Height> [MaxAge] [MaxReproductivityAge]";
         return -1;
     }
 
     const unsigned long width = static_cast<unsigned long>(atol(argv[1]));
     const unsigned long height = static_cast<unsigned long>(atol(argv[2]));
-    const unsigned long maxAge = static_cast<unsigned long>(atol(argv[3]));
-    const unsigned long maxReproductivityAge = static_cast<unsigned long>(atol(argv[4]));
-    if (width == 0 || height == 0 || maxAge == 0 || maxReproductivityAge == 0)
+    if (width == 0 || height == 0)
     {
         std::cout << "Invalid argument";
         return -1;
     }
 
-    AdvancedFlatland flatland(CreateAdvancedMap(RandomDistributionWithoutLimits{width, height}),
-        maxAge, maxReproductivityAge);
+    const unsigned long maxAge = argc < 5 ? 0 : static_cast<unsigned long>(atol(argv[3]));
+    const unsigned long maxReproductivityAge = argc < 5 ? 0 : static_cast<unsigned long>(atol(argv[4]));
 
-    while (true)
+    if (maxAge == 0)
     {
-        const auto& stat = flatland.GetStatistics();
-
-        std::cout
-            << "Generation: " << stat._generation
-            << " Alive cells: " << stat._aliveCells
-            << " Reproductive cells: " << stat._reproductiveCells
-            << (stat._loopDetected ? " [LOOP]" : "")
-            << "\n";
-        std::cout.flush();
-
-        if (stat._aliveCells <= 0)
-        {
-            break;
-        }
-
-        flatland.Run();
-
-        if (stat._aliveCells <= 0)
-        {
-            break;
-        }
+        run(SimpleFlatland(CreateSimpleMap(RandomDistributionWithoutLimits{width, height})));
     }
-
-    std::cout << std::endl;
-    std::cout
-        << "G: " << flatland.GetStatistics()._generation
-        << " -- " << width << "x" << height
-        << " " << maxAge << "(" << maxReproductivityAge << ")"
-        << std::endl;
+    else if (maxReproductivityAge != 0)
+    {
+        run(AdvancedFlatland(CreateAdvancedMap(RandomDistributionWithoutLimits{width, height}),
+            maxAge, maxReproductivityAge));
+    }
+    else
+    {
+        std::cout << "Invalid argument";
+        return -1;
+    }
 
     return 0;
 }

@@ -3,13 +3,23 @@
 #include <deque>
 #include <vector>
 
-// Finds loops in infinite sequences
+namespace flatland
+{
+
+namespace lib
+{
+
+// Finds loops in infinite sequence of numbers
 class CycleFinder
 {
 public:
     CycleFinder(unsigned long maxCycleLength, unsigned long confirmationCount);
 
-    bool Apply(unsigned long item);
+    // Applies one more number to the finder
+    void Apply(unsigned long item);
+
+    // Checks if a cycle already found
+    bool HasCycle();
 
 private:
     std::deque<unsigned long> _window;
@@ -20,3 +30,7 @@ private:
     std::vector<unsigned long> _cycle;
     unsigned long _cycles;
 };
+
+}
+
+}

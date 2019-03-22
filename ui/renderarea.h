@@ -1,16 +1,14 @@
-#ifndef RENDERAREA_H
-#define RENDERAREA_H
-
-#include "lib/AdvancedFlatland.h"
+#pragma once
 
 #include <QWidget>
+#include <QSharedPointer>
 
+template <typename TFlatland>
 class RenderArea : public QWidget
 {
-    Q_OBJECT
 public:
     explicit RenderArea(QWidget* parent, const QPoint& topLeft, const QSize size, int scale,
-                        QSharedPointer<flatland::lib::AdvancedFlatland> flatland);
+                        QSharedPointer<TFlatland> flatland);
 
     QSize sizeHint() const override;
 
@@ -21,7 +19,7 @@ private:
     QSize m_size;
     QPoint m_relativeTopLeftPoint;
     int m_scale;
-    QSharedPointer<flatland::lib::AdvancedFlatland> m_flatland;
+    QSharedPointer<TFlatland> m_flatland;
 
     void doPaint();
 
@@ -30,4 +28,4 @@ protected:
 
 };
 
-#endif // RENDERAREA_H
+#include "renderarea.inl"

@@ -1,23 +1,21 @@
-#ifndef WINDOW_H
-#define WINDOW_H
+#pragma once
 
-#include "lib/AdvancedFlatland.h"
+#include "renderarea.h"
 
 #include <QWidget>
 #include <QSharedPointer>
 
-class RenderArea;
 class QTimer;
 
+template <typename TFlatland>
 class Window : public QWidget
 {
-    Q_OBJECT
+public:
+    Window(QSharedPointer<TFlatland> flatland);
+
+    QSize sizeHint() const override;
 
 public:
-    Window(QWidget *parent, unsigned long width, unsigned long height,
-           unsigned long maxAge, unsigned long maxReproductivityAge);
-
-public slots:
     void plotNextGeneration();
 
 protected:
@@ -26,9 +24,9 @@ protected:
     void keyPressEvent(QKeyEvent* event) override;
 
 private:
-    QSharedPointer<flatland::lib::AdvancedFlatland> m_flatland;
-    RenderArea* m_renderArea;
+    QSharedPointer<TFlatland> m_flatland;
+    RenderArea<TFlatland>* m_renderArea;
     QTimer* m_timer;
 };
 
-#endif // WINDOW_H
+#include "window.inl"

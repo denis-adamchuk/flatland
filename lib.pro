@@ -16,7 +16,8 @@ HEADERS = \
     lib/AdvancedMapCreator.h \
     lib/AdvancedFlatland.h \
     lib/Common.h \
-    lib/CycleFinder.h
+    lib/CycleFinder.h \
+    lib/Statistics.h
 
 SOURCES = \
    $$PWD/lib/SimpleFlatland.cpp \
