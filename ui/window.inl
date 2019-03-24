@@ -22,14 +22,12 @@ Window<TFlatland>::Window(QSharedPointer<TFlatland> flatland)
     , m_flatland(flatland)
     , m_renderArea(new RenderArea<TFlatland>(
         this,
-        QPoint(0, 0),
         QSize{ static_cast<int>(flatland->Width()), static_cast<int>(flatland->Height()) },
-        1.0,
         flatland))
     , m_timer(new QTimer(this))
 {
     setEnabled(true);
-    setMouseTracking(true);
+    //setMouseTracking(true);
     setWindowTitle("QT-Based Flatland");
 
     m_timer->setTimerType(Qt::TimerType::PreciseTimer);
@@ -62,14 +60,18 @@ void Window<TFlatland>::wheelEvent(QWheelEvent *event)
 template <typename TFlatland>
 void Window<TFlatland>::mousePressEvent(QMouseEvent* event)
 {
-    if (event->button() & Qt::LeftButton)
+    m_renderAreaMoveStartPoint = { event->x(), event->y() };
+    event->accept();
+}
+
+template <typename TFlatland>
+void Window<TFlatland>::mouseMoveEvent(QMouseEvent* event)
+{
+    if (m_renderAreaMoveStartPoint.has_value())
     {
-        m_renderArea->updateTopLeft(event->x(), event->y());
-        m_renderArea->update();
-    }
-    else if (event->button() & Qt::RightButton)
-    {
-        m_renderArea->updateTopLeft(event->x(), event->y());
+        m_renderArea->updateTopLeft(event->x() - m_renderAreaMoveStartPoint->x(),
+                                    event->y() - m_renderAreaMoveStartPoint->y());
+        m_renderAreaMoveStartPoint = { event->x(), event->y() };
         m_renderArea->update();
     }
 
@@ -77,17 +79,16 @@ void Window<TFlatland>::mousePressEvent(QMouseEvent* event)
 }
 
 template <typename TFlatland>
-void Window<TFlatland>::keyPressEvent(QKeyEvent *event)
+void Window<TFlatland>::mouseReleaseEvent(QMouseEvent* event)
 {
-    if (event->key() == Qt::Key::Key_Plus)
-    {
-        m_renderArea->updateScale(true);
-    }
-    else if (event->key() == Qt::Key::Key_Minus)
-    {
-        m_renderArea->updateScale(false);
-    }
+    m_renderAreaMoveStartPoint.reset();
+    event->accept();
+}
 
+template <typename TFlatland>
+void Window<TFlatland>::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    m_renderArea->updateScale(event->button() == Qt::MouseButton::LeftButton, event->x(), event->y());
     event->accept();
 }
 

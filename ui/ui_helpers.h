@@ -10,6 +10,7 @@
 #include <vector>
 
 const QRgb sc_backgroundColor = qRgb(250, 250, 215);
+const QRgb sc_externalAreaColor = qRgb(200, 200, 200);
 
 QColor getColorOfCell(const flatland::lib::SimpleFlatland& /*flatland*/, size_t /*i*/, size_t /*j*/);
 QColor getColorOfCell(const flatland::lib::AdvancedFlatland& flatland, size_t i, size_t j);

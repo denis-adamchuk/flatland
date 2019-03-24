@@ -6,18 +6,23 @@
 #include <QPen>
 
 #include <vector>
+#include <cmath>
 
 namespace
 {
+    const double sc_minScale = 1;  // 1 cell takes area 1x1 px
+    const double sc_maxScale = 16; // 1 cell takes area 16x16 px
+    const double sc_defaultScale = sc_minScale;
+
+    const double sc_scaleRate = 2;
 }
 
 template <typename TFlatland>
-RenderArea<TFlatland>::RenderArea(QWidget *parent, const QPoint& topLeft, const QSize size, int scale,
-                       QSharedPointer<TFlatland> flatland)
+RenderArea<TFlatland>::RenderArea(QWidget *parent, const QSize size, QSharedPointer<TFlatland> flatland)
     : QWidget(parent)
     , m_size(size)
-    , m_relativeTopLeftPoint(topLeft)
-    , m_scale(scale)
+    , m_relativeTopLeftPoint{0, 0}
+    , m_scale{sc_defaultScale}
     , m_flatland(flatland)
 {
 }
@@ -33,8 +38,11 @@ void RenderArea<TFlatland>::doPaint()
 {
     QPainter painter(this);
 
-    const QRect rc(0, 0, m_size.width(), m_size.height());
-    painter.fillRect(rc, sc_backgroundColor);
+    const QRect rcExt(0, 0, m_size.width(), m_size.height());
+    painter.fillRect(rcExt, sc_externalAreaColor);
+
+    const QRect rcBk(m_relativeTopLeftPoint, QSize(m_size.width() * m_scale, m_size.height() * m_scale));
+    painter.fillRect(rcBk, sc_backgroundColor);
 
     painter.setPen(Qt::red);
     int ypos = 20; // start
@@ -53,17 +61,22 @@ void RenderArea<TFlatland>::doPaint()
                 const auto cellX = static_cast<int>(i);
                 const auto cellY = static_cast<int>(j);
 
-                const auto cellRelativeX = cellX * m_scale - m_relativeTopLeftPoint.x();
-                const auto cellRelativeY = cellY * m_scale - m_relativeTopLeftPoint.y();
+                const auto cellRelativeX = cellX * m_scale + m_relativeTopLeftPoint.x();
+                const auto cellRelativeY = cellY * m_scale + m_relativeTopLeftPoint.y();
 
                 if (cellRelativeX >= 0 && cellRelativeX < m_size.width() &&
                     cellRelativeY >= 0 && cellRelativeY < m_size.height())
                 {
                     auto color = getColorOfCell(*m_flatland, i, j);
-                    if (i < 50)
-                        color = Qt::red;
-                    else if (i > m_flatland->Width() - 50)
-                        color = Qt::blue;
+//                    if (i < 50)
+//                        color = Qt::red;
+//                    else if (i > m_flatland->Width() - 50)
+//                        color = Qt::blue;
+//                    if (i > m_flatland->Width() / 2 - 50 && i < m_flatland->Width() / 2 + 50 &&
+//                        j > m_flatland->Height() / 2 - 50 && j < m_flatland->Height() / 2 + 50)
+//                    {
+//                        color = Qt::black;
+//                    }
                     painter.setPen(color);
                     for (int sX = 0; sX < m_scale; ++sX)
                     {
@@ -87,28 +100,26 @@ void RenderArea<TFlatland>::paintEvent(QPaintEvent * /* event */)
 template <typename TFlatland>
 void RenderArea<TFlatland>::updateTopLeft(int x, int y)
 {
-    const auto iClicked = (m_relativeTopLeftPoint.x() + x) / m_scale;
-    const auto jClicked = (m_relativeTopLeftPoint.y() + y) / m_scale;
-
-    const auto iCenter = (m_size.width() / 2) / m_scale;
-    const auto jCenter = (m_size.height() / 2) / m_scale;
-
-    const auto iOffset = iCenter - iClicked;
-    const auto jOffset = jCenter - jClicked;
-
-    m_relativeTopLeftPoint.setX(-iOffset);
-    m_relativeTopLeftPoint.setY(-jOffset);
+    m_relativeTopLeftPoint.setX(m_relativeTopLeftPoint.x() + x);
+    m_relativeTopLeftPoint.setY(m_relativeTopLeftPoint.y() + y);
 }
 
 template <typename TFlatland>
-void RenderArea<TFlatland>::updateScale(bool increment)
+void RenderArea<TFlatland>::updateScale(bool increment, int x, int y)
 {
-    if (increment && m_scale < 32)
+    const auto newScale = (increment ? m_scale * sc_scaleRate : m_scale / sc_scaleRate);
+    if (newScale >= sc_minScale && newScale <= sc_maxScale)
     {
-        m_scale *= 2;
-    }
-    else if (!increment && m_scale > 1)
-    {
-        m_scale /= 2;
+        if (increment)
+        {
+            m_relativeTopLeftPoint.setX(2 * m_relativeTopLeftPoint.x() - x);
+            m_relativeTopLeftPoint.setY(2 * m_relativeTopLeftPoint.y() - y);
+        }
+        else
+        {
+            m_relativeTopLeftPoint.setX((m_relativeTopLeftPoint.x() + x) / 2);
+            m_relativeTopLeftPoint.setY((m_relativeTopLeftPoint.y() + y) / 2);
+        }
+        m_scale = newScale;
     }
 }
