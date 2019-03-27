@@ -1,7 +1,14 @@
 TEMPLATE = subdirs
 
+SUBDIRS += lib.pro
+
+contains(DEFINES, DESKTOP) {
 SUBDIRS += \
-    lib.pro \
     ui.pro \
     console2.pro \
     ut.pro
+}
+else {
+SUBDIRS += \
+    ui-android.pro
+}

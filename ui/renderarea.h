@@ -7,12 +7,12 @@ template <typename TFlatland>
 class RenderArea : public QWidget
 {
 public:
-    explicit RenderArea(QWidget* parent, const QSize size, QSharedPointer<TFlatland> flatland);
+    explicit RenderArea(QWidget* parent, QSharedPointer<TFlatland> flatland);
 
     QSize sizeHint() const override;
 
-    void updateTopLeft(int x, int y);
-    void updateScale(bool increment, int x, int y);
+    void updateTopLeft(QPoint pt);
+    void updateScale(qreal scale, QPoint pt);
 
 private:
     void doPaint();

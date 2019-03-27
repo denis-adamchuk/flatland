@@ -13,14 +13,12 @@ namespace
     const double sc_minScale = 1;  // 1 cell takes area 1x1 px
     const double sc_maxScale = 16; // 1 cell takes area 16x16 px
     const double sc_defaultScale = sc_minScale;
-
-    const double sc_scaleRate = 2;
 }
 
 template <typename TFlatland>
-RenderArea<TFlatland>::RenderArea(QWidget *parent, const QSize size, QSharedPointer<TFlatland> flatland)
+RenderArea<TFlatland>::RenderArea(QWidget *parent, QSharedPointer<TFlatland> flatland)
     : QWidget(parent)
-    , m_size(size)
+    , m_size(QSize{ static_cast<int>(flatland->Width()), static_cast<int>(flatland->Height()) })
     , m_relativeTopLeftPoint{0, 0}
     , m_scale{sc_defaultScale}
     , m_flatland(flatland)
@@ -68,15 +66,6 @@ void RenderArea<TFlatland>::doPaint()
                     cellRelativeY >= 0 && cellRelativeY < m_size.height())
                 {
                     auto color = getColorOfCell(*m_flatland, i, j);
-//                    if (i < 50)
-//                        color = Qt::red;
-//                    else if (i > m_flatland->Width() - 50)
-//                        color = Qt::blue;
-//                    if (i > m_flatland->Width() / 2 - 50 && i < m_flatland->Width() / 2 + 50 &&
-//                        j > m_flatland->Height() / 2 - 50 && j < m_flatland->Height() / 2 + 50)
-//                    {
-//                        color = Qt::black;
-//                    }
                     painter.setPen(color);
                     for (int sX = 0; sX < m_scale; ++sX)
                     {
@@ -98,28 +87,30 @@ void RenderArea<TFlatland>::paintEvent(QPaintEvent * /* event */)
 }
 
 template <typename TFlatland>
-void RenderArea<TFlatland>::updateTopLeft(int x, int y)
+void RenderArea<TFlatland>::updateTopLeft(QPoint pt)
 {
-    m_relativeTopLeftPoint.setX(m_relativeTopLeftPoint.x() + x);
-    m_relativeTopLeftPoint.setY(m_relativeTopLeftPoint.y() + y);
+    m_relativeTopLeftPoint.setX(m_relativeTopLeftPoint.x() + pt.x());
+    m_relativeTopLeftPoint.setY(m_relativeTopLeftPoint.y() + pt.y());
+    update();
 }
 
 template <typename TFlatland>
-void RenderArea<TFlatland>::updateScale(bool increment, int x, int y)
+void RenderArea<TFlatland>::updateScale(qreal scale, QPoint pt)
 {
-    const auto newScale = (increment ? m_scale * sc_scaleRate : m_scale / sc_scaleRate);
+    const auto newScale = m_scale * scale;
     if (newScale >= sc_minScale && newScale <= sc_maxScale)
     {
-        if (increment)
+        if (newScale > m_scale)
         {
-            m_relativeTopLeftPoint.setX(2 * m_relativeTopLeftPoint.x() - x);
-            m_relativeTopLeftPoint.setY(2 * m_relativeTopLeftPoint.y() - y);
+            m_relativeTopLeftPoint.setX(2 * m_relativeTopLeftPoint.x() - pt.x());
+            m_relativeTopLeftPoint.setY(2 * m_relativeTopLeftPoint.y() - pt.y());
         }
         else
         {
-            m_relativeTopLeftPoint.setX((m_relativeTopLeftPoint.x() + x) / 2);
-            m_relativeTopLeftPoint.setY((m_relativeTopLeftPoint.y() + y) / 2);
+            m_relativeTopLeftPoint.setX((m_relativeTopLeftPoint.x() + pt.x()) / 2);
+            m_relativeTopLeftPoint.setY((m_relativeTopLeftPoint.y() + pt.y()) / 2);
         }
         m_scale = newScale;
+        update();
     }
 }

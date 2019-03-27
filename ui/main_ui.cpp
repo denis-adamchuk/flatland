@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 {
     if (argc < 3)
     {
-        std::cout << "Use: console2 <Width | 0> <Height | 0> [MaxAge] [MaxReproductivityAge]";
+        std::cout << "Use: ui <Width | 0> <Height | 0> [MaxAge] [MaxReproductivityAge]";
         return -1;
     }
 

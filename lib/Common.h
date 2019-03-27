@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <functional>
+#include <initializer_list>
 
 namespace flatland
 {
@@ -24,8 +25,8 @@ struct RandomDistributionWithoutLimits
 template <typename TMapElement>
 struct FlatlandMap
 {
-    typedef TMapElement value_type;
     typedef typename std::vector<TMapElement>::const_reference const_reference;
+    typedef typename std::vector<TMapElement>::value_type value_type;
 
     const MapDimensions _dimensions;
     std::vector<TMapElement> _map;
@@ -45,9 +46,12 @@ void WriteCell(TMap& map, size_t i, size_t j, const typename TMap::value_type& v
 template <typename TMap>
 const typename TMap::const_reference ReadCell(const TMap& map, size_t i, size_t j)
 {
-    static const typename TMap::value_type sc_dummy{};
+    static const typename TMap::value_type defaultItem{ false };
+    static std::vector<typename TMap::value_type> items;
+    if (items.empty())
+        items.emplace_back(defaultItem);
     if (i >= map._dimensions._width || j >= map._dimensions._height)
-        return sc_dummy; // a border of the world
+        return items[0];
 
     return map._map[j * map._dimensions._width + i];
 }

@@ -14,16 +14,15 @@ const int sc_minTimerInterval = 1;
 const int sc_maxTimerInterval = 2000;
 const int sc_defaultTimerInterval = 200;
 
+const double sc_scaleRate = 2;
+
 }
 
 template <typename TFlatland>
 Window<TFlatland>::Window(QSharedPointer<TFlatland> flatland)
     : QWidget(nullptr)
     , m_flatland(flatland)
-    , m_renderArea(new RenderArea<TFlatland>(
-        this,
-        QSize{ static_cast<int>(flatland->Width()), static_cast<int>(flatland->Height()) },
-        flatland))
+    , m_renderArea(new RenderArea<TFlatland>(this, flatland))
     , m_timer(new QTimer(this))
 {
     setEnabled(true);
@@ -69,12 +68,12 @@ void Window<TFlatland>::mouseMoveEvent(QMouseEvent* event)
 {
     if (m_renderAreaMoveStartPoint.has_value())
     {
-        m_renderArea->updateTopLeft(event->x() - m_renderAreaMoveStartPoint->x(),
-                                    event->y() - m_renderAreaMoveStartPoint->y());
-        m_renderAreaMoveStartPoint = { event->x(), event->y() };
-        m_renderArea->update();
+        const QPoint pt(event->pos());
+        const QPoint ptNew(pt.x() - m_renderAreaMoveStartPoint->x(),
+                           pt.y() - m_renderAreaMoveStartPoint->y());
+        m_renderArea->updateTopLeft(ptNew);
+        m_renderAreaMoveStartPoint = pt;
     }
-
     event->accept();
 }
 
@@ -88,7 +87,8 @@ void Window<TFlatland>::mouseReleaseEvent(QMouseEvent* event)
 template <typename TFlatland>
 void Window<TFlatland>::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    m_renderArea->updateScale(event->button() == Qt::MouseButton::LeftButton, event->x(), event->y());
+    m_renderArea->updateScale(event->button() == Qt::MouseButton::LeftButton ? sc_scaleRate : 1. / sc_scaleRate,
+                              event->pos());
     event->accept();
 }
 
