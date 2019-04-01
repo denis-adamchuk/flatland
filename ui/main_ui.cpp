@@ -36,12 +36,14 @@ int main(int argc, char *argv[])
     std::unique_ptr<QWidget> p;
     if (maxAge == 0 && maxReproductivityAge == 0)
     {
-        QSharedPointer<SimpleFlatland> f(new SimpleFlatland(CreateSimpleMap(RandomDistributionWithoutLimits{widthToUse, heightToUse})));
+        QSharedPointer<SimpleFlatland> f(
+                    new SimpleFlatland(CreateSimpleMap(RandomDistributionWithoutLimits{widthToUse, heightToUse})));
         p.reset(new Window(f));
     }
     else if (maxAge != 0 && maxReproductivityAge != 0)
     {
-        QSharedPointer<AdvancedFlatland> f(new AdvancedFlatland(CreateAdvancedMap(RandomDistributionWithoutLimits{widthToUse, heightToUse}),
+        QSharedPointer<AdvancedFlatland> f(
+                    new AdvancedFlatland(CreateAdvancedMap(RandomDistributionWithoutLimits{widthToUse, heightToUse}),
             maxAge, maxReproductivityAge));
         p.reset(new Window(f));
     }

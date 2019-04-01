@@ -19,20 +19,24 @@ SimpleFlatland::SimpleFlatland(const SimpleCellMap& flatlandMap)
     : _currentGeneration(flatlandMap)
     , _cycleFinder(sc_maxCycleLength, sc_cyclesConfirmationCount)
 {
+    unsigned long aliveCells = 0;
+
     for (size_t j = 0; j < _currentGeneration._dimensions._height; ++j)
     {
         for (size_t i = 0; i < _currentGeneration._dimensions._width; ++i)
         {
             if (isAliveCell(i, j))
-                ++_lastStatSnapshot._aliveCells;
+                ++aliveCells;
         }
     }
 
-    _lastStatSnapshot._aliveCellsDelta = static_cast<signed long>(_lastStatSnapshot._aliveCells);
-    _lastStatSnapshot._generation = 0; // start
+    _lastStatSnapshot["AliveCells"].Set(aliveCells);
+    _lastStatSnapshot["AliveCellsDelta"].Set(static_cast<long>(aliveCells));
+    _lastStatSnapshot["Generation"].Set(static_cast<unsigned long>(0));
+    _lastStatSnapshot["LoopDetected"].Set(false);
 }
 
-void SimpleFlatland::Run()
+bool SimpleFlatland::Run()
 {
     using namespace std::placeholders;
 
@@ -61,15 +65,20 @@ void SimpleFlatland::Run()
 
     _currentGeneration._map = std::move(nextGeneration._map);
 
-    _lastStatSnapshot._aliveCellsDelta =
-        static_cast<signed long>(aliveCells - _lastStatSnapshot._aliveCells);
-    _lastStatSnapshot._aliveCells = aliveCells;
-    ++_lastStatSnapshot._generation;
-    if (!_lastStatSnapshot._loopDetected)
+    auto prevAliveCells = _lastStatSnapshot["AliveCells"].Get<unsigned long>();
+    _lastStatSnapshot["AliveCellsDelta"].Set(static_cast<long>(aliveCells - prevAliveCells));
+    _lastStatSnapshot["AliveCells"].Set(aliveCells);
+    auto prevGeneration = _lastStatSnapshot["Generation"].Get<unsigned long>();
+    _lastStatSnapshot["Generation"].Set(prevGeneration + 1);
+
+    if (!_lastStatSnapshot["LoopDetected"].Get<bool>())
     {
         _cycleFinder.Apply(aliveCells);
-        _lastStatSnapshot._loopDetected = _cycleFinder.HasCycle();
+        if (_cycleFinder.HasCycle())
+            _lastStatSnapshot["LoopDetected"].Set(true);
     }
+
+    return aliveCells > 0;
 }
 
 size_t SimpleFlatland::Width() const
@@ -90,7 +99,7 @@ bool SimpleFlatland::IsCellAlive(size_t i, size_t j) const
     return ReadCell(_currentGeneration, i, j);
 }
 
-const Statistics& SimpleFlatland::GetStatistics() const
+const StatisticsMap& SimpleFlatland::GetStatistics() const
 {
     return _lastStatSnapshot;
 }

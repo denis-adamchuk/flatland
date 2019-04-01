@@ -15,26 +15,29 @@ AdvancedFlatland::AdvancedFlatland(const AdvancedCellMap& flatlandMap, unsigned 
     , _maxAge(maxAge)
     , _maxReproductivityAge(maxReproductivityAge)
 {
+    unsigned long aliveCells = 0;
+    unsigned long reproductiveCells = 0;
+
     for (size_t j = 0; j < _currentGeneration._dimensions._height; ++j)
     {
         for (size_t i = 0; i < _currentGeneration._dimensions._width; ++i)
         {
             if (isAliveCell(i, j))
-                ++_lastStatSnapshot._aliveCells;
+                ++aliveCells;
             if (isReproductiveCell(i, j))
-                ++_lastStatSnapshot._reproductiveCells;
+                ++reproductiveCells;
         }
     }
 
-    _lastStatSnapshot._aliveCellsDelta = static_cast<signed long>(_lastStatSnapshot._aliveCells);
-    _lastStatSnapshot._reproductiveCellsDelta = static_cast<signed long>(_lastStatSnapshot._reproductiveCells);
-    _lastStatSnapshot._generation = 0; // start
+    _lastStatSnapshot["AliveCells"].Set(aliveCells);
+    _lastStatSnapshot["ReproductiveCells"].Set(reproductiveCells);
+    _lastStatSnapshot["AliveCellsDelta"].Set(static_cast<long>(aliveCells));
+    _lastStatSnapshot["ReproductiveCellsDelta"].Set(static_cast<long>(reproductiveCells));
+    _lastStatSnapshot["Generation"].Set(static_cast<unsigned long>(0));
 }
 
-void AdvancedFlatland::Run()
+bool AdvancedFlatland::Run()
 {
-    using namespace std::placeholders;
-
     unsigned long aliveCells = 0;
     unsigned long reproductiveCells = 0;
 
@@ -71,13 +74,16 @@ void AdvancedFlatland::Run()
 
     _currentGeneration._map = std::move(nextGeneration._map);
 
-    _lastStatSnapshot._aliveCellsDelta =
-        static_cast<signed long>(aliveCells - _lastStatSnapshot._aliveCells);
-    _lastStatSnapshot._aliveCells = aliveCells;
-    _lastStatSnapshot._reproductiveCellsDelta =
-        static_cast<signed long>(reproductiveCells - _lastStatSnapshot._reproductiveCells);
-    _lastStatSnapshot._reproductiveCells = reproductiveCells;
-    ++_lastStatSnapshot._generation;
+    auto prevAliveCells = _lastStatSnapshot["AliveCells"].Get<unsigned long>();
+    _lastStatSnapshot["AliveCellsDelta"].Set(static_cast<long>(aliveCells - prevAliveCells));
+    _lastStatSnapshot["AliveCells"].Set(aliveCells);
+    auto prevReproductiveCells = _lastStatSnapshot["ReproductiveCells"].Get<unsigned long>();
+    _lastStatSnapshot["ReproductiveCellsDelta"].Set(static_cast<long>(reproductiveCells - prevReproductiveCells));
+    _lastStatSnapshot["ReproductiveCells"].Set(reproductiveCells);
+    auto prevGeneration = _lastStatSnapshot["Generation"].Get<unsigned long>();
+    _lastStatSnapshot["Generation"].Set(prevGeneration + 1);
+
+    return aliveCells > 0;
 }
 
 size_t AdvancedFlatland::Width() const
@@ -108,7 +114,7 @@ unsigned long AdvancedFlatland::GetMaxAge() const
     return _maxAge;
 }
 
-const AdvancedStatistics& AdvancedFlatland::GetStatistics() const
+const StatisticsMap& AdvancedFlatland::GetStatistics() const
 {
     return _lastStatSnapshot;
 }

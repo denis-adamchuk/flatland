@@ -12,8 +12,16 @@
 const QRgb sc_backgroundColor = qRgb(250, 250, 215);
 const QRgb sc_externalAreaColor = qRgb(200, 200, 200);
 
-QColor getColorOfCell(const flatland::lib::SimpleFlatland& /*flatland*/, size_t /*i*/, size_t /*j*/);
-QColor getColorOfCell(const flatland::lib::AdvancedFlatland& flatland, size_t i, size_t j);
+namespace flatland
+{
+namespace lib
+{
+    struct IFlatland;
+}
+}
 
-std::vector<QString> getLegend(const flatland::lib::SimpleFlatland& flatland);
-std::vector<QString> getLegend(const flatland::lib::AdvancedFlatland& flatland);
+//QColor getColorOfCell(const flatland::lib::SimpleFlatland& /*flatland*/, size_t /*i*/, size_t /*j*/);
+//QColor getColorOfCell(const flatland::lib::AdvancedFlatland& flatland, size_t i, size_t j);
+
+//std::vector<QString> GetLegend(const flatland::lib::IFlatland& flatland);
+//std::vector<QString> getLegend(const flatland::lib::AdvancedFlatland& flatland);

@@ -9,36 +9,18 @@
 using namespace flatland;
 using namespace flatland::lib;
 
-void printStatistics(const SimpleFlatland& flatland)
-{
-    const auto& stat = flatland.GetStatistics();
-    std::cout
-        << "Generation: " << stat._generation
-        << " Alive cells: " << stat._aliveCells
-        << (stat._loopDetected ? " [LOOP]" : "")
-        << "\n";
-    std::cout.flush();
-}
-
-void printStatistics(const AdvancedFlatland& flatland)
-{
-    const auto& stat = flatland.GetStatistics();
-    std::cout
-        << "Generation: " << stat._generation
-        << " Alive cells: " << stat._aliveCells
-        << " Reproductive cells: " << stat._reproductiveCells
-        << "\n";
-    std::cout.flush();
-}
-
 template <typename TFlatland>
 void run(TFlatland&& flatland)
 {
-    const auto& stat = flatland.GetStatistics();
-    while (stat._aliveCells > 0)
+    while (flatland.Run())
     {
-        printStatistics(flatland);
-        flatland.Run();
+        for (const auto& i: flatland.GetStatistics())
+        {
+            const auto& name = i.first;
+            const auto& val = i.second;
+            std::cout << name << ": " << val.GetAsText() << "     ";
+        }
+        std::cout << std::endl;
     }
 }
 

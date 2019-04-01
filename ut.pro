@@ -7,6 +7,8 @@ QT       -= gui
 
 TEMPLATE = app
 
+CONFIG += c++17
+
 HEADERS = \
    $$PWD/catch2/catch.hpp \
    $$PWD/catch2/catch_reporter_automake.hpp \

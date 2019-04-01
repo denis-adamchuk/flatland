@@ -1,5 +1,6 @@
 #pragma once
 
+#include "FlatlandItf.h"
 #include "AdvancedMapCreator.h"
 #include "Statistics.h"
 
@@ -10,7 +11,7 @@ namespace lib
 {
 
 // Defines a world of cells
-class AdvancedFlatland
+class AdvancedFlatland : public IFlatland
 {
 public:
     // Creates a world of the given size
@@ -18,16 +19,16 @@ public:
         unsigned long maxReproductivityAge);
 
     // Evaluates a next generation of cells
-    void Run();
+    bool Run() override;
 
     // Returns a flatland width
-    size_t Width() const;
+    size_t Width() const override;
 
     // Returns a flatland height
-    size_t Height() const;
+    size_t Height() const override;
 
     // Checks if there is a live cell at the given spot (i - col, j - row)
-    bool IsCellAlive(size_t i, size_t j) const;
+    bool IsCellAlive(size_t i, size_t j) const override;
 
     // Returns age of c cell at the given spot (i - col, j - row)
     unsigned long GetCellAge(size_t i, size_t j) const;
@@ -36,15 +37,17 @@ public:
     unsigned long GetMaxAge() const;
 
     // Gather cell statistics
-    const AdvancedStatistics& GetStatistics() const;
+    const StatisticsMap& GetStatistics() const override;
 
 private:
     bool isAliveCell(size_t i, size_t j) const;
     bool isReproductiveCell(size_t i, size_t j) const;
 
 private:
+
+private:
     AdvancedCellMap _currentGeneration;
-    AdvancedStatistics _lastStatSnapshot;
+    StatisticsMap _lastStatSnapshot;
     unsigned long _maxAge;
     unsigned long _maxReproductivityAge;
 };

@@ -17,7 +17,9 @@ HEADERS = \
     lib/AdvancedFlatland.h \
     lib/Common.h \
     lib/CycleFinder.h \
-    lib/Statistics.h
+    lib/Statistics.h \
+    lib/flatlandvisitoritf.h \
+    lib/FlatlandItf.h
 
 SOURCES = \
    $$PWD/lib/SimpleFlatland.cpp \

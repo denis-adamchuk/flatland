@@ -1,6 +1,6 @@
 #include "window-android.h"
 
-#include "ui/renderarea.h"
+#include "ui/RenderAreaBase.h"
 
 #include <QTimer>
 #include <QScreen>

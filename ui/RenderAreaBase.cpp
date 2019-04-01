@@ -1,7 +1,8 @@
-#include "renderarea.h"
+#include "RenderAreaBase.h"
 
-#include "ui_helpers.h"
+#include "lib/FlatlandItf.h"
 
+#include <QString>
 #include <QPainter>
 #include <QPen>
 
@@ -10,51 +11,67 @@
 
 namespace
 {
+    const QRgb sc_backgroundColor = qRgb(250, 250, 215);
+    const QRgb sc_externalAreaColor = qRgb(200, 200, 200);
+
     const double sc_minScale = 1;  // 1 cell takes area 1x1 px
     const double sc_maxScale = 16; // 1 cell takes area 16x16 px
     const double sc_defaultScale = sc_minScale;
+
+    std::vector<QString> GetLegend(const flatland::lib::IFlatland& flatland)
+    {
+        std::vector<QString> v;
+
+        for (const auto& i: flatland.GetStatistics())
+        {
+            const auto& name = i.first;
+            const auto& val = i.second;
+            v.push_back(QString("%1: %2").arg(name.c_str(), val.GetAsText().c_str()));
+        }
+
+        return v;
+    }
 }
 
-template <typename TFlatland>
-RenderArea<TFlatland>::RenderArea(QWidget *parent, QSharedPointer<TFlatland> flatland)
+RenderAreaBase::RenderAreaBase(QWidget *parent)
     : QWidget(parent)
-    , m_size(QSize{ static_cast<int>(flatland->Width()), static_cast<int>(flatland->Height()) })
     , m_relativeTopLeftPoint{0, 0}
     , m_scale{sc_defaultScale}
-    , m_flatland(flatland)
 {
 }
 
-template <typename TFlatland>
-QSize RenderArea<TFlatland>::sizeHint() const
+QSize RenderAreaBase::sizeHint() const
 {
-    return m_size;
+    const auto& cells = getCells();
+    return { static_cast<int>(cells.Width()), static_cast<int>(cells.Height()) };
 }
 
-template <typename TFlatland>
-void RenderArea<TFlatland>::doPaint()
+void RenderAreaBase::paintEvent(QPaintEvent * /* event */)
 {
+    const auto& cells = getCells();
+    const QSize& size = sizeHint();
+
     QPainter painter(this);
 
-    const QRect rcExt(0, 0, m_size.width(), m_size.height());
+    const QRect rcExt(0, 0, size.width(), size.height());
     painter.fillRect(rcExt, sc_externalAreaColor);
 
-    const QRect rcBk(m_relativeTopLeftPoint, QSize(m_size.width() * m_scale, m_size.height() * m_scale));
+    const QRect rcBk(m_relativeTopLeftPoint, QSize(size.width() * m_scale, size.height() * m_scale));
     painter.fillRect(rcBk, sc_backgroundColor);
 
     painter.setPen(Qt::red);
     int ypos = 20; // start
-    for (const auto& s : getLegend(*m_flatland))
+    for (const auto& s : GetLegend(cells))
     {
         painter.drawText(QPoint{10, ypos}, s);
         ypos += 20;
     }
 
-    for (size_t j = 0; j < m_flatland->Height(); ++j)
+    for (size_t j = 0; j < size.height(); ++j)
     {
-        for (size_t i = 0; i < m_flatland->Width(); ++i)
+        for (size_t i = 0; i < size.width(); ++i)
         {
-            if (m_flatland->IsCellAlive(i, j))
+            if (cells.IsCellAlive(i, j))
             {
                 const auto cellX = static_cast<int>(i);
                 const auto cellY = static_cast<int>(j);
@@ -62,11 +79,10 @@ void RenderArea<TFlatland>::doPaint()
                 const auto cellRelativeX = cellX * m_scale + m_relativeTopLeftPoint.x();
                 const auto cellRelativeY = cellY * m_scale + m_relativeTopLeftPoint.y();
 
-                if (cellRelativeX >= 0 && cellRelativeX < m_size.width() &&
-                    cellRelativeY >= 0 && cellRelativeY < m_size.height())
+                if (cellRelativeX >= 0 && cellRelativeX < size.width() &&
+                    cellRelativeY >= 0 && cellRelativeY < size.height())
                 {
-                    auto color = getColorOfCell(*m_flatland, i, j);
-                    painter.setPen(color);
+                    painter.setPen(getColor(i, j));
                     for (int sX = 0; sX < m_scale; ++sX)
                     {
                         for (int sY = 0; sY < m_scale; ++sY)
@@ -80,22 +96,14 @@ void RenderArea<TFlatland>::doPaint()
     }
 }
 
-template <typename TFlatland>
-void RenderArea<TFlatland>::paintEvent(QPaintEvent * /* event */)
-{
-    doPaint();
-}
-
-template <typename TFlatland>
-void RenderArea<TFlatland>::updateTopLeft(QPoint pt)
+void RenderAreaBase::UpdateTopLeft(QPoint pt)
 {
     m_relativeTopLeftPoint.setX(m_relativeTopLeftPoint.x() + pt.x());
     m_relativeTopLeftPoint.setY(m_relativeTopLeftPoint.y() + pt.y());
     update();
 }
 
-template <typename TFlatland>
-void RenderArea<TFlatland>::updateScale(qreal scale, QPoint pt)
+void RenderAreaBase::UpdateScale(qreal scale, QPoint pt)
 {
     const auto newScale = m_scale * scale;
     if (newScale >= sc_minScale && newScale <= sc_maxScale)

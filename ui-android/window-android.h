@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ui/renderarea.h"
+#include "ui/RenderAreaBase.h"
 #include "lib/SimpleFlatland.h"
 #include "lib/AdvancedFlatland.h"
 

@@ -1,42 +1,23 @@
 #include "window.h"
 
-#include "renderarea.h"
+#include "RenderAreaBase.h"
+#include "renderareafactory.h"
+#include "TimerBasedFlatlandRunner.h"
 
-#include <QTimer>
-#include <QScreen>
 #include <QWheelEvent>
-#include <QDesktopWidget>
-
-namespace
-{
-
-const int sc_minTimerInterval = 1;
-const int sc_maxTimerInterval = 2000;
-const int sc_defaultTimerInterval = 200;
-
-const double sc_scaleRate = 2;
-
-}
 
 template <typename TFlatland>
 Window<TFlatland>::Window(QSharedPointer<TFlatland> flatland)
     : QWidget(nullptr)
-    , m_flatland(flatland)
-    , m_renderArea(new RenderArea<TFlatland>(this, flatland))
-    , m_timer(new QTimer(this))
+    , m_runner(flatland,
+                    [this]()
+                {
+                    m_renderArea->update();
+                }, [](){})
+    , m_renderArea(CreateRenderArea(this, flatland))
 {
     setEnabled(true);
-    //setMouseTracking(true);
     setWindowTitle("QT-Based Flatland");
-
-    m_timer->setTimerType(Qt::TimerType::PreciseTimer);
-    m_timer->setInterval(sc_minTimerInterval);
-    m_timer->callOnTimeout(
-        [&]()
-    {
-        plotNextGeneration();
-    });
-    m_timer->start(sc_defaultTimerInterval);
 }
 
 template <typename TFlatland>
@@ -50,9 +31,7 @@ void Window<TFlatland>::wheelEvent(QWheelEvent *event)
 {
     const auto degrees = event->angleDelta() / 8 / 2;
     const auto delta = degrees.y();
-    const auto currentInterval = m_timer->interval();
-    const auto interval = std::min(std::max(currentInterval - delta, sc_minTimerInterval), sc_maxTimerInterval);
-    m_timer->setInterval(interval);
+    m_runner.AdjustInterval(delta);
     event->accept();
 }
 
@@ -71,7 +50,7 @@ void Window<TFlatland>::mouseMoveEvent(QMouseEvent* event)
         const QPoint pt(event->pos());
         const QPoint ptNew(pt.x() - m_renderAreaMoveStartPoint->x(),
                            pt.y() - m_renderAreaMoveStartPoint->y());
-        m_renderArea->updateTopLeft(ptNew);
+        m_renderArea->UpdateTopLeft(ptNew);
         m_renderAreaMoveStartPoint = pt;
     }
     event->accept();
@@ -87,14 +66,9 @@ void Window<TFlatland>::mouseReleaseEvent(QMouseEvent* event)
 template <typename TFlatland>
 void Window<TFlatland>::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    m_renderArea->updateScale(event->button() == Qt::MouseButton::LeftButton ? sc_scaleRate : 1. / sc_scaleRate,
+    static const double sc_scaleRate = 2;
+
+    m_renderArea->UpdateScale(event->button() == Qt::MouseButton::LeftButton ? sc_scaleRate : 1. / sc_scaleRate,
                               event->pos());
     event->accept();
-}
-
-template <typename TFlatland>
-void Window<TFlatland>::plotNextGeneration()
-{
-    m_flatland->Run();
-    m_renderArea->update();
 }
