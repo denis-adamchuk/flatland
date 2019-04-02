@@ -1,19 +1,20 @@
 #include "window.h"
 
 #include "RenderAreaBase.h"
-#include "renderareafactory.h"
-#include "TimerBasedFlatlandRunner.h"
+#include "RenderAreaFactory.h"
+#include "AdjustableTimer.h"
 
 #include <QWheelEvent>
 
 template <typename TFlatland>
 Window<TFlatland>::Window(QSharedPointer<TFlatland> flatland)
     : QWidget(nullptr)
-    , m_runner(flatland,
-                    [this]()
+    , m_timer(this,
+                    [flatland, this]()
                 {
+                    flatland->Run();
                     m_renderArea->update();
-                }, [](){})
+                })
     , m_renderArea(CreateRenderArea(this, flatland))
 {
     setEnabled(true);
@@ -31,7 +32,7 @@ void Window<TFlatland>::wheelEvent(QWheelEvent *event)
 {
     const auto degrees = event->angleDelta() / 8 / 2;
     const auto delta = degrees.y();
-    m_runner.AdjustInterval(delta);
+    m_timer.AdjustInterval(delta);
     event->accept();
 }
 

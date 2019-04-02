@@ -1,6 +1,8 @@
 #pragma once
 
+#include "ui/AdjustableTimer.h"
 #include "ui/RenderAreaBase.h"
+
 #include "lib/SimpleFlatland.h"
 #include "lib/AdvancedFlatland.h"
 
@@ -19,12 +21,8 @@ class Window : public QWidget
 public:
     Window(QSharedPointer<SimpleFlatland> simpleFlatland, QSharedPointer<AdvancedFlatland> advancedFlatland);
 
-    QSize sizeHint() const override;
-
-public:
-    void plotNextGeneration();
-
 protected:
+    QSize sizeHint() const override;
     bool event(QEvent* event) override;
 
 private:
@@ -37,15 +35,9 @@ private:
     void updateTopLeft(QPoint currentPoint, QPoint prevPoint);
 
 private:
-    QSharedPointer<SimpleFlatland> m_simpleFlatland;
-    RenderArea<SimpleFlatland>* m_simpleRenderArea;
-
-    QSharedPointer<AdvancedFlatland> m_advancedFlatland;
-    RenderArea<AdvancedFlatland>* m_advancedRenderArea;
+    AdjustableTimer m_runner;
+    RenderAreaBase* m_simpleRenderArea;
+    RenderAreaBase* m_advancedRenderArea;
 
     bool m_isActiveSimpleFlatland;
-
-    QTimer* m_timer;
-    //std::optional<QPoint> m_renderAreaMoveStartPoint;
-    void initTimer();
 };

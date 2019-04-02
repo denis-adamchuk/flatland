@@ -35,6 +35,6 @@ private:
     // how distant is cell with coordinates (0, 0) from the top left point of the screen
     QPoint m_relativeTopLeftPoint;
 
-    // current scale
-    double m_scale;
+    // current scale, number of pixels that match a single pixel in each of X/Y directions
+    unsigned long m_scale;
 };

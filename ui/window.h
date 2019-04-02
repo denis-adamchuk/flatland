@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TimerBasedFlatlandRunner.h"
+#include "AdjustableTimer.h"
 
 #include <QWidget>
 #include <QSharedPointer>
@@ -15,12 +15,8 @@ class Window : public QWidget
 public:
     Window(QSharedPointer<TFlatland> flatland);
 
-    QSize sizeHint() const override;
-
-public:
-    void plotNextGeneration();
-
 protected:
+    QSize sizeHint() const override;
     void wheelEvent(QWheelEvent* event) override;
     void mousePressEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
@@ -28,7 +24,7 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent* event) override;
 
 private:
-    TimerBasedFlatlandRunner m_runner;
+    AdjustableTimer m_timer;
     RenderAreaBase* m_renderArea;
     std::optional<QPoint> m_renderAreaMoveStartPoint;
 };

@@ -12,7 +12,7 @@ const flatland::lib::IFlatland &RenderAreaSimple::getCells() const
     return *m_flatland;
 }
 
-QColor RenderAreaSimple::getColor(unsigned long i, unsigned long j) const
+QColor RenderAreaSimple::getColor(unsigned long, unsigned long) const
 {
     return Qt::green;
 }

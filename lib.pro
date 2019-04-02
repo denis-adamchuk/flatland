@@ -18,7 +18,6 @@ HEADERS = \
     lib/Common.h \
     lib/CycleFinder.h \
     lib/Statistics.h \
-    lib/flatlandvisitoritf.h \
     lib/FlatlandItf.h
 
 SOURCES = \

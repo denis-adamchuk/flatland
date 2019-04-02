@@ -1,8 +1,7 @@
 #include "AdjustableTimer.h"
 
-#include "lib/FlatlandItf.h"
-
 #include <QTimer>
+#include <QWidget>
 
 namespace
 {
@@ -13,12 +12,9 @@ const int sc_defaultTimerInterval = 200;
 
 }
 
-using namespace flatland;
-using namespace flatland::lib;
-
-AdjustableTimer::AdjustableTimer(QWidget* parent, std::function<void()> onNextGeneration)
-    : m_timer(new QTimer(nullptr))
-    , m_onTimer(onNextGeneration)
+AdjustableTimer::AdjustableTimer(QWidget* parent, std::function<void()> onTimer)
+    : m_timer(new QTimer(parent))
+    , m_onTimer(onTimer)
 {
     m_timer->setTimerType(Qt::TimerType::PreciseTimer);
     m_timer->setInterval(sc_minTimerInterval);

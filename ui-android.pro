@@ -27,13 +27,18 @@ CONFIG += c++17
 SOURCES += \
         $$PWD/ui-android/main_ui-android.cpp \
         $$PWD/ui-android/window-android.cpp \
-    	$$PWD/ui/renderarea.inl \
-    	$$PWD/ui/ui_helpers.cpp
+        $$PWD/ui/AdjustableTimer.cpp \
+        $$PWD/ui/RenderAreaBase.cpp \
+        $$PWD/ui/RenderAreaSimple.cpp \
+        $$PWD/ui/RenderAreaAdvanced.cpp
 
 HEADERS += \
         $$PWD/ui-android/window-android.h \
-        $$PWD/ui/renderarea.h \
-    	$$PWD/ui/ui_helpers.h
+        $$PWD/ui/AdjustableTimer.h \
+        $$PWD/ui/RenderAreaBase.h \
+        $$PWD/ui/RenderAreaSimple.h \
+        $$PWD/ui/RenderAreaAdvanced.h \
+        $$PWD/ui/RenderAreaFactory.h
 
 CONFIG += mobility
 MOBILITY = 
@@ -57,3 +62,17 @@ else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/./debug
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/./release/lib.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/./debug/lib.lib
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/./liblib.a
+
+DISTFILES += \
+    android/AndroidManifest.xml \
+    android/gradle/wrapper/gradle-wrapper.jar \
+    android/gradlew \
+    android/res/values/libs.xml \
+    android/build.gradle \
+    android/gradle/wrapper/gradle-wrapper.properties \
+    android/gradlew.bat
+
+contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
+    ANDROID_PACKAGE_SOURCE_DIR = \
+        $$PWD/android
+}

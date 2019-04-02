@@ -1,48 +1,31 @@
 #include "window-android.h"
 
-#include "ui/RenderAreaBase.h"
+#include "ui/RenderAreaFactory.h"
 
-#include <QTimer>
-#include <QScreen>
 #include <QWheelEvent>
-#include <QDesktopWidget>
-
-namespace
-{
-
-const int sc_minTimerInterval = 1;
-const int sc_maxTimerInterval = 2000;
-const int sc_defaultTimerInterval = 200;
-
-}
-
-void Window::initTimer()
-{
-    m_timer->setTimerType(Qt::TimerType::PreciseTimer);
-    m_timer->setInterval(sc_minTimerInterval);
-    m_timer->callOnTimeout(
-        [&]()
-    {
-        plotNextGeneration();
-    });
-    m_timer->start(sc_defaultTimerInterval);
-}
 
 Window::Window(QSharedPointer<SimpleFlatland> simpleFlatland, QSharedPointer<AdvancedFlatland> advancedFlatland)
     : QWidget(nullptr)
-    , m_simpleFlatland(simpleFlatland)
-    , m_simpleRenderArea(new RenderArea<SimpleFlatland>(this, simpleFlatland))
-    , m_advancedFlatland(advancedFlatland)
-    , m_advancedRenderArea(new RenderArea<AdvancedFlatland>(this, m_advancedFlatland))
-    , m_isActiveSimpleFlatland(false)
-    , m_timer(new QTimer(this))
+    , m_runner(this,
+                    [&]()
+                {
+                    if (m_isActiveSimpleFlatland)
+                    {
+                        simpleFlatland->Run();
+                        m_simpleRenderArea->update();
+                    }
+                    else
+                    {
+                        advancedFlatland->Run();
+                        m_advancedRenderArea->update();
+                    }
+                })
+    , m_simpleRenderArea(CreateRenderArea(this, simpleFlatland))
+    , m_advancedRenderArea(CreateRenderArea(this, advancedFlatland))
 {
-    setEnabled(true);
-    setWindowTitle("QT-Based Flatland");
     setAttribute(Qt::WA_AcceptTouchEvents);
 
     toggleRenderArea();
-    initTimer();
 }
 
 QSize Window::sizeHint() const
@@ -67,9 +50,7 @@ void Window::toggleRenderArea()
 
 void Window::changeSpeed(int delta)
 {
-    const auto currentInterval = m_timer->interval();
-    const auto interval = std::min(std::max(currentInterval - delta, sc_minTimerInterval), sc_maxTimerInterval);
-    m_timer->setInterval(interval);
+    m_runner.AdjustInterval(delta);
 }
 
 void Window::processOneTouchPoint(const QTouchEvent& event)
@@ -165,30 +146,16 @@ bool Window::event(QEvent* event)
 void Window::updateScale(qreal scale, QPoint pt)
 {
     if (m_isActiveSimpleFlatland)
-        m_simpleRenderArea->updateScale(scale, pt);
+        m_simpleRenderArea->UpdateScale(scale, pt);
     else
-        m_advancedRenderArea->updateScale(scale, pt);
+        m_advancedRenderArea->UpdateScale(scale, pt);
 }
 
 void Window::updateTopLeft(QPoint currentPoint, QPoint prevPoint)
 {
     const QPoint ptNew(currentPoint.x() - prevPoint.x(), currentPoint.y() - prevPoint.y());
     if (m_isActiveSimpleFlatland)
-        m_simpleRenderArea->updateTopLeft(ptNew);
+        m_simpleRenderArea->UpdateTopLeft(ptNew);
     else
-        m_advancedRenderArea->updateTopLeft(ptNew);
-}
-
-void Window::plotNextGeneration()
-{
-    if (m_isActiveSimpleFlatland)
-    {
-        m_simpleFlatland->Run();
-        m_simpleRenderArea->update();
-    }
-    else
-    {
-        m_advancedFlatland->Run();
-        m_advancedRenderArea->update();
-    }
+        m_advancedRenderArea->UpdateTopLeft(ptNew);
 }
