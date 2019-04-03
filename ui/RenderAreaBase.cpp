@@ -15,7 +15,7 @@ namespace
     const QRgb sc_externalAreaColor = qRgb(200, 200, 200);
 
     const unsigned long sc_minScale = 1;  // 1 cell takes area 1x1 px
-    const unsigned long sc_maxScale = 16; // 1 cell takes area 16x16 px
+    const unsigned long sc_maxScale = 128; // 1 cell takes area 16x16 px
     const unsigned long sc_defaultScale = sc_minScale;
 
     std::vector<QString> GetLegend(const flatland::lib::IFlatland& flatland)
@@ -72,6 +72,7 @@ void RenderAreaBase::paintEvent(QPaintEvent * /* event */)
         ypos += 20;
     }
 
+    std::optional<QColor> prevColor;
     for (size_t j = 0; j < static_cast<size_t>(size.height()); ++j)
     {
         for (size_t i = 0; i < static_cast<size_t>(size.width()); ++i)
@@ -87,7 +88,11 @@ void RenderAreaBase::paintEvent(QPaintEvent * /* event */)
                 if (cellRelativeX >= 0 && cellRelativeX < size.width() &&
                     cellRelativeY >= 0 && cellRelativeY < size.height())
                 {
-                    painter.setPen(getColor(i, j));
+                    const auto color = getColor(i, j);
+                    if (!prevColor || *prevColor != color)
+                        painter.setPen(color);
+                    prevColor = color;
+
                     for (size_t sX = 0; sX < m_scale; ++sX)
                     {
                         for (size_t sY = 0; sY < m_scale; ++sY)

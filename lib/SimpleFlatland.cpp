@@ -25,7 +25,7 @@ SimpleFlatland::SimpleFlatland(const SimpleCellMap& flatlandMap)
     {
         for (size_t i = 0; i < _currentGeneration._dimensions._width; ++i)
         {
-            if (isAliveCell(i, j))
+            if (IsCellAlive(i, j))
                 ++aliveCells;
         }
     }
@@ -47,19 +47,33 @@ bool SimpleFlatland::Run()
     {
         for (size_t i = 0; i < _currentGeneration._dimensions._width; ++i)
         {
-            const auto current = ReadCell(_currentGeneration, i, j);
-            const auto siblings = CountSiblings(i, j,
-                [this](size_t i, size_t j)
+            size_t siblings = 0;
+            for (int x = -1; x < 2; ++x)
             {
-                return isAliveCell(i, j);
-            });
+                for (int y = -1; y < 2; ++y)
+                {
+                    if (x == 0 && y == 0)
+                        continue;
+                    if (i == 0 && x < 0)
+                        continue;
+                    if (j == 0 && y < 0)
+                        continue;
+                    if (i == _currentGeneration._dimensions._width - 1 && x > 0)
+                        continue;
+                    if (j == _currentGeneration._dimensions._height - 1 && y > 0)
+                        continue;
 
+                    siblings += IsCellAlive(static_cast<size_t>(x) + i, static_cast<size_t>(y) + j);
+                }
+            }
+
+            const auto current = IsCellAlive(i, j);
             if (current && (siblings < 2 || siblings > 3))
                 WriteCell(nextGeneration, i, j, false);
             else if (!current && siblings == 3)
                 WriteCell(nextGeneration, i, j, true);
 
-            aliveCells += isAliveCell(i, j);
+            aliveCells += current;
         }
     }
 
@@ -93,20 +107,12 @@ size_t SimpleFlatland::Height() const
 
 bool SimpleFlatland::IsCellAlive(size_t i, size_t j) const
 {
-    if (i >= _currentGeneration._dimensions._width || j >= _currentGeneration._dimensions._height)
-        throw std::range_error("Bad coordinate(s) passed");
-
     return ReadCell(_currentGeneration, i, j);
 }
 
 const StatisticsMap& SimpleFlatland::GetStatistics() const
 {
     return _lastStatSnapshot;
-}
-
-bool SimpleFlatland::isAliveCell(size_t i, size_t j) const
-{
-    return ReadCell(_currentGeneration, i, j);
 }
 
 }

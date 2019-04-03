@@ -34,9 +34,6 @@ public:
     const StatisticsMap& GetStatistics() const override;
 
 private:
-    bool isAliveCell(size_t i, size_t j) const;
-
-private:
     SimpleCellMap _currentGeneration;
     StatisticsMap _lastStatSnapshot;
     CycleFinder _cycleFinder;

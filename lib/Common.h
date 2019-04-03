@@ -46,23 +46,7 @@ void WriteCell(TMap& map, size_t i, size_t j, const typename TMap::value_type& v
 template <typename TMap>
 const typename TMap::const_reference ReadCell(const TMap& map, size_t i, size_t j)
 {
-    static const typename TMap::value_type defaultItem{ false };
-    static std::vector<typename TMap::value_type> items;
-    if (items.empty())
-        items.emplace_back(defaultItem);
-    if (i >= map._dimensions._width || j >= map._dimensions._height)
-        return items[0];
-
     return map._map[j * map._dimensions._width + i];
-}
-
-template <typename TFnCheck>
-unsigned long CountSiblings(size_t i, size_t j, const TFnCheck& fn)
-{
-    return
-        fn(i - 1, j - 1) + fn(i, j - 1) + fn(i + 1, j - 1)
-      + fn(i - 1, j)                    + fn(i + 1, j)
-      + fn(i - 1, j + 1) + fn(i, j + 1) + fn(i + 1, j + 1);
 }
 
 }

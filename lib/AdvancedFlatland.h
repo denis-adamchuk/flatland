@@ -40,8 +40,7 @@ public:
     const StatisticsMap& GetStatistics() const override;
 
 private:
-    bool isAliveCell(size_t i, size_t j) const;
-    bool isReproductiveCell(size_t i, size_t j) const;
+    bool isReproductiveAge(unsigned long age) const;
 
 private:
 
@@ -51,6 +50,11 @@ private:
     unsigned long _maxAge;
     unsigned long _maxReproductivityAge;
 };
+
+inline bool AdvancedFlatland::isReproductiveAge(unsigned long age) const
+{
+    return age > 0 && age < _maxReproductivityAge;
+}
 
 }
 
