@@ -32,3 +32,8 @@ void AdjustableTimer::AdjustInterval(int delta)
     const auto interval = std::min(std::max(currentInterval - delta, sc_minTimerInterval), sc_maxTimerInterval);
     m_timer->setInterval(interval);
 }
+
+int AdjustableTimer::GetInterval() const
+{
+    return m_timer->interval();
+}

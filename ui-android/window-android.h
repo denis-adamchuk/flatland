@@ -24,6 +24,7 @@ public:
 protected:
     QSize sizeHint() const override;
     bool event(QEvent* event) override;
+    void paintEvent(QPaintEvent* event) override;
 
 private:
     void processOneTouchPoint(const QTouchEvent& event);
@@ -35,9 +36,11 @@ private:
     void updateTopLeft(QPoint currentPoint, QPoint prevPoint);
 
 private:
-    AdjustableTimer m_runner;
+    AdjustableTimer m_timer;
     RenderAreaBase* m_simpleRenderArea;
     RenderAreaBase* m_advancedRenderArea;
 
     bool m_isActiveSimpleFlatland;
+
+    QSize m_screenSize;
 };

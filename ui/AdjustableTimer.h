@@ -11,6 +11,7 @@ public:
     AdjustableTimer(QWidget* parent, std::function<void()> onTimer);
 
     void AdjustInterval(int delta);
+    int GetInterval() const;
 
 private:
     QTimer* m_timer;
