@@ -26,19 +26,10 @@ CONFIG += c++17
 
 SOURCES += \
         $$PWD/ui-android/main_ui-android.cpp \
-        $$PWD/ui-android/window-android.cpp \
-        $$PWD/ui/AdjustableTimer.cpp \
-        $$PWD/ui/RenderAreaBase.cpp \
-        $$PWD/ui/RenderAreaSimple.cpp \
-        $$PWD/ui/RenderAreaAdvanced.cpp
+        $$PWD/ui-android/window-android.cpp
 
 HEADERS += \
-        $$PWD/ui-android/window-android.h \
-        $$PWD/ui/AdjustableTimer.h \
-        $$PWD/ui/RenderAreaBase.h \
-        $$PWD/ui/RenderAreaSimple.h \
-        $$PWD/ui/RenderAreaAdvanced.h \
-        $$PWD/ui/RenderAreaFactory.h
+        $$PWD/ui-android/window-android.h
 
 CONFIG += mobility
 MOBILITY = 
@@ -62,3 +53,16 @@ else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/./debug
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/./release/lib.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/./debug/lib.lib
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/./liblib.a
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/./release/ -lui-lib
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/./debug/ -lui-lib
+else:unix: LIBS += -L$$OUT_PWD/./ -lui-lib
+
+INCLUDEPATH += $$PWD/.
+DEPENDPATH += $$PWD/.
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/./release/libui-lib.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/./debug/libui-lib.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/./release/ui-lib.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/./debug/ui-lib.lib
+else:unix: PRE_TARGETDEPS += $$OUT_PWD/./libui-lib.a

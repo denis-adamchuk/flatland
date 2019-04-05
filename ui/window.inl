@@ -1,8 +1,8 @@
 #include "window.h"
 
-#include "RenderAreaBase.h"
-#include "RenderAreaFactory.h"
-#include "AdjustableTimer.h"
+#include "ui-lib/RenderAreaBase.h"
+#include "ui-lib/RenderAreaFactory.h"
+#include "ui-lib/AdjustableTimer.h"
 
 #include <QWheelEvent>
 
@@ -69,7 +69,7 @@ void Window<TFlatland>::mouseDoubleClickEvent(QMouseEvent *event)
 {
     static const double sc_scaleRate = 2;
 
-    m_renderArea->UpdateScale(event->button() == Qt::MouseButton::LeftButton ? sc_scaleRate : 1. / sc_scaleRate,
+    m_renderArea->Rescale(event->button() == Qt::MouseButton::LeftButton ? sc_scaleRate : 1. / sc_scaleRate,
                               event->pos());
     event->accept();
 }

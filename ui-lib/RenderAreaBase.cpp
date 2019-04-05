@@ -71,6 +71,10 @@ void RenderAreaBase::paintEvent(QPaintEvent * /* event */)
         painter.drawText(QPoint{10, ypos}, s);
         ypos += 20;
     }
+    painter.drawText(QPoint{10, ypos}, QString("m_scale : %1").arg(QString::number(m_scale)));
+    ypos += 20;
+    painter.drawText(QPoint{10, ypos}, QString("m_relativeTopLeftPoint : {%1;%2}").
+                     arg(QString::number(m_relativeTopLeftPoint.x()), QString::number(m_relativeTopLeftPoint.y())));
 
     std::optional<QColor> prevColor;
     for (size_t j = 0; j < static_cast<size_t>(size.height()); ++j)
@@ -114,22 +118,28 @@ void RenderAreaBase::UpdateTopLeft(QPoint pt)
     update();
 }
 
-void RenderAreaBase::UpdateScale(qreal scale, QPoint pt)
+void RenderAreaBase::Rescale(qreal scale, QPoint pt)
 {
-    const auto newScale = m_scale * scale;
-    if (newScale >= sc_minScale && newScale <= sc_maxScale)
+    const int intScale = scale;
+    const auto newScale = m_scale * intScale;
+    if (newScale != m_scale && newScale >= sc_minScale && newScale <= sc_maxScale)
     {
         if (newScale > m_scale)
         {
-            m_relativeTopLeftPoint.setX(2 * m_relativeTopLeftPoint.x() - pt.x());
-            m_relativeTopLeftPoint.setY(2 * m_relativeTopLeftPoint.y() - pt.y());
+            m_relativeTopLeftPoint.setX(intScale * m_relativeTopLeftPoint.x() - pt.x());
+            m_relativeTopLeftPoint.setY(intScale * m_relativeTopLeftPoint.y() - pt.y());
         }
         else
         {
-            m_relativeTopLeftPoint.setX((m_relativeTopLeftPoint.x() + pt.x()) / 2);
-            m_relativeTopLeftPoint.setY((m_relativeTopLeftPoint.y() + pt.y()) / 2);
+            m_relativeTopLeftPoint.setX((m_relativeTopLeftPoint.x() + pt.x()) / intScale);
+            m_relativeTopLeftPoint.setY((m_relativeTopLeftPoint.y() + pt.y()) / intScale);
         }
         m_scale = static_cast<unsigned long>(newScale);
         update();
     }
+}
+
+unsigned long RenderAreaBase::GetScale()
+{
+    return m_scale;
 }

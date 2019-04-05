@@ -1,6 +1,7 @@
 TEMPLATE = subdirs
 
-SUBDIRS += lib.pro
+SUBDIRS += lib.pro \
+    	   ui-lib.pro
 
 contains(DEFINES, DESKTOP) {
 SUBDIRS += \

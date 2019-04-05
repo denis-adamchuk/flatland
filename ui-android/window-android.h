@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ui/AdjustableTimer.h"
-#include "ui/RenderAreaBase.h"
+#include "ui-lib/AdjustableTimer.h"
+#include "ui-lib/RenderAreaBase.h"
 
 #include "lib/SimpleFlatland.h"
 #include "lib/AdvancedFlatland.h"
@@ -37,10 +37,24 @@ private:
 
 private:
     AdjustableTimer m_timer;
-    RenderAreaBase* m_simpleRenderArea;
-    RenderAreaBase* m_advancedRenderArea;
+    RenderAreaBase* m_simpleRenderArea = nullptr;
+    RenderAreaBase* m_advancedRenderArea = nullptr;
 
-    bool m_isActiveSimpleFlatland;
+    bool m_isActiveSimpleFlatland = false;
 
     QSize m_screenSize;
+
+    qreal m_lineLength1;
+    qreal m_lineLength2;
+    std::optional<qreal> m_initialLength;
+    qreal m_scale;
+
+    int m_lasttype;
+    int m_lastPointsCount;
+
+    QPoint m_center1;
+    QPoint m_center2;
+
+    unsigned long m_prevScale = 1;
+    qreal m_touchPointRescaleStep = 0;
 };

@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     const unsigned long maxAge = 100;
     const unsigned long maxReproductivityAge = 75;
     const auto widthToUse = static_cast<size_t>(QGuiApplication::screens().front()->size().width());
-    const auto heightToUse = static_cast<size_t>(QGuiApplication::screens().front()->size().height() - 20);
+    const auto heightToUse = static_cast<size_t>(QGuiApplication::screens().front()->size().height() - 200);
 
     QSharedPointer<SimpleFlatland> f1(
         new SimpleFlatland(CreateSimpleMap(RandomDistributionWithoutLimits{widthToUse, heightToUse})));

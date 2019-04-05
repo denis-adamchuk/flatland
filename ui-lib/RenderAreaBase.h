@@ -19,7 +19,8 @@ public:
     QSize sizeHint() const override;
 
     void UpdateTopLeft(QPoint pt);
-    void UpdateScale(qreal scale, QPoint pt);
+    void Rescale(qreal scale, QPoint pt);
+    unsigned long GetScale();
 
 protected:
     void paintEvent(QPaintEvent* event) override;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AdjustableTimer.h"
+#include "ui-lib/AdjustableTimer.h"
 
 #include <QWidget>
 #include <QSharedPointer>

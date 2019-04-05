@@ -1,11 +1,13 @@
 #include "window-android.h"
 
-#include "ui/RenderAreaFactory.h"
+#include "ui-lib/RenderAreaFactory.h"
 
 #include <QScreen>
 #include <QPainter>
 #include <QWheelEvent>
 #include <QGuiApplication>
+
+#include <cmath>
 
 Window::Window(QSharedPointer<SimpleFlatland> simpleFlatland, QSharedPointer<AdvancedFlatland> advancedFlatland)
     : QWidget(nullptr)
@@ -25,19 +27,20 @@ Window::Window(QSharedPointer<SimpleFlatland> simpleFlatland, QSharedPointer<Adv
                 })
     , m_simpleRenderArea(CreateRenderArea(this, simpleFlatland))
     , m_advancedRenderArea(CreateRenderArea(this, advancedFlatland))
-    , m_isActiveSimpleFlatland(false)
 {
+    setEnabled(true);
     setAttribute(Qt::WA_AcceptTouchEvents);
 
     toggleRenderArea();
 
     m_screenSize = QGuiApplication::screens().front()->size();
+    m_touchPointRescaleStep = std::sqrt(
+                m_screenSize.width() * m_screenSize.width() + m_screenSize.height() * m_screenSize.height()) / 100.;
 }
 
 QSize Window::sizeHint() const
 {
     return m_screenSize;
-    //return m_isActiveSimpleFlatland ? m_simpleRenderArea->sizeHint() : m_advancedRenderArea->sizeHint();
 }
 
 void Window::toggleRenderArea()
@@ -57,7 +60,7 @@ void Window::toggleRenderArea()
 
 void Window::changeSpeed(int delta)
 {
-    m_timer.AdjustInterval(delta);
+    m_timer.AdjustInterval(-delta);
     update();
 }
 
@@ -118,8 +121,31 @@ void Window::processTwoTouchPoints(const QTouchEvent& event)
     const QLineF line1(touchPoint1.lastScenePos(), touchPoint2.lastScenePos());
     const QLineF line2(touchPoint1.scenePos(), touchPoint2.scenePos());
 
-    //updateScale(line2.length() / line1.length(), line2.center().toPoint());
-    updateScale(2.0, line2.center().toPoint());
+    const auto pt = line2.center().toPoint();
+
+    if (!m_initialLength)
+    {
+        m_initialLength = line2.length();
+    }
+    else
+    {
+		const auto prevDelta = line1.length() - *m_initialLength;
+        const auto curDelta = line2.length() - *m_initialLength;
+        if (delta > 0)
+        {
+			const auto rescale = (curDelta - prevDelta) / m_touchPointRescaleStep;
+            updateScale(rescale, pt);
+        }
+        else if (delta < 0)
+        {
+			const auto rescale = m_touchPointRescaleStep / (curDelta - prevDelta);
+			updateScale(rescale, pt);
+        }
+    }
+
+    m_lineLength1 = line1.length();
+    m_lineLength2 = line2.length();
+    update();
 }
 
 bool Window::event(QEvent* event)
@@ -130,7 +156,13 @@ bool Window::event(QEvent* event)
     case QEvent::TouchUpdate:
     case QEvent::TouchEnd:
     {
+        if (event->type() == QEvent::TouchEnd)
+        {
+            m_initialLength.reset();
+        }
+        m_lasttype = event->type();
         auto touchEvent = static_cast<QTouchEvent*>(event);
+        m_lastPointsCount = touchEvent->touchPoints().count();
         switch (touchEvent->touchPoints().count())
         {
         case 1:
@@ -155,9 +187,10 @@ bool Window::event(QEvent* event)
 void Window::updateScale(qreal scale, QPoint pt)
 {
     if (m_isActiveSimpleFlatland)
-        m_simpleRenderArea->UpdateScale(scale, pt);
+        m_simpleRenderArea->Rescale(scale, pt);
     else
-        m_advancedRenderArea->UpdateScale(scale, pt);
+        m_advancedRenderArea->Rescale(scale, pt);
+    m_scale = scale;
 }
 
 void Window::updateTopLeft(QPoint currentPoint, QPoint prevPoint)
@@ -177,7 +210,34 @@ void Window::paintEvent(QPaintEvent * /* event */)
     font.setPixelSize(12);
     painter.setFont(font);
 
+    int ypos = m_screenSize.height() - 180;
     painter.setPen(Qt::blue);
-    painter.drawText(QPoint{m_screenSize.width() / 2, m_screenSize.height()},
+    painter.drawText(QPoint{m_screenSize.width() / 2, ypos},
                      QString("Speed: %1").arg(QString::number(m_timer.GetInterval())));
+    ypos += 20;
+    painter.drawText(QPoint{m_screenSize.width() / 2, ypos},
+                     QString("Line Length 1: %1").arg(QString::number(m_lineLength1)));
+    ypos += 20;
+    painter.drawText(QPoint{m_screenSize.width() / 2, ypos},
+                     QString("Line Length 2: %1").arg(QString::number(m_lineLength2)));
+    ypos += 20;
+    painter.drawText(QPoint{m_screenSize.width() / 2, ypos},
+                     QString("m_scale: %1").arg(QString::number(m_scale)));
+    ypos += 20;
+    painter.drawText(QPoint{m_screenSize.width() / 2, ypos},
+                     QString("Initial Length: %1").arg(QString::number(*m_initialLength)));
+    ypos += 20;
+    painter.drawText(QPoint{m_screenSize.width() / 2, ypos},
+                     QString("Last type: %1").arg(QString::number(m_lasttype)));
+    ypos += 20;
+    painter.drawText(QPoint{m_screenSize.width() / 2, ypos},
+                     QString("Last points count: %1").arg(QString::number(m_lastPointsCount)));
+    ypos += 20;
+    painter.drawText(QPoint{m_screenSize.width() / 2, ypos},
+                     QString("Center1: {%1;%2}").arg(QString::number(m_center1.x()),
+                                                     QString::number(m_center1.y())));
+    ypos += 20;
+    painter.drawText(QPoint{m_screenSize.width() / 2, ypos},
+                     QString("Center2: {%1;%2}").arg(QString::number(m_center2.x()),
+                                                     QString::number(m_center2.y())));
 }
