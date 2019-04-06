@@ -13,12 +13,15 @@ namespace lib
 class CycleFinder
 {
 public:
+    // User has to specify:
+    // - an upper limit for a length of a cycle to be found
+    // - a number of confirmations for a found cycle
     CycleFinder(unsigned long maxCycleLength, unsigned long confirmationCount);
 
     // Applies one more number to the finder
     void Apply(unsigned long item);
 
-    // Checks if a cycle already found
+    // Checks if a confirmed cycle already found
     bool HasCycle();
 
 private:

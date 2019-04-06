@@ -10,7 +10,7 @@ namespace flatland
 namespace lib
 {
 
-// Defines a world of cells
+// Defines a world of cells which have ages
 class AdvancedFlatland : public IFlatland
 {
 public:
@@ -18,7 +18,7 @@ public:
     AdvancedFlatland(const AdvancedCellMap& flatlandMap, unsigned long maxAge,
         unsigned long maxReproductivityAge);
 
-    // Evaluates a next generation of cells
+    // Performs a single step of cell evolution within the whole world
     bool Run() override;
 
     // Returns a flatland width
@@ -33,16 +33,15 @@ public:
     // Returns age of c cell at the given spot (i - col, j - row)
     unsigned long GetCellAge(size_t i, size_t j) const;
 
-    // Returns a maximum age saved on flatland construction
+    // Returns a maximum age specified in Flatland constructor
     unsigned long GetMaxAge() const;
 
     // Gather cell statistics
     const StatisticsMap& GetStatistics() const override;
 
 private:
+    // Checks if a cell with passed age can born new cells
     bool isReproductiveAge(unsigned long age) const;
-
-private:
 
 private:
     AdvancedCellMap _currentGeneration;

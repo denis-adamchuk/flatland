@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
     const unsigned long maxAge = argc < 5 ? 0 : static_cast<unsigned long>(atol(argv[3]));
     const unsigned long maxReproductivityAge = argc < 5 ? 0 : static_cast<unsigned long>(atol(argv[4]));
 
+    // If width or height is not specified, we create a flatland of the same size as a full-screen window
     QApplication a(argc, argv);
     const auto fullScreen = width == 0 || height == 0;
     const auto widthToUse = fullScreen ? static_cast<size_t>(QGuiApplication::screens().front()->size().width())

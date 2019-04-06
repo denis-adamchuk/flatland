@@ -24,7 +24,7 @@ AdvancedCellMap CreateAdvancedMap(const RandomDistributionWithoutLimits& spec)
         {
             if (std::rand() % 2)
             {
-                const AdvancedCell cell = { 1 };
+                const AdvancedCell cell = { 1 }; // all cells have the same age in the beginning (just hypothesis)
                 WriteCell(result, i, j, cell);
             }
         }

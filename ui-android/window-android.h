@@ -16,6 +16,7 @@ class QTouchEvent;
 
 using namespace flatland::lib;
 
+// Main window for Android UI version of Flatland application
 class Window : public QWidget
 {
 public:

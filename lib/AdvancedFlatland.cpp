@@ -45,6 +45,7 @@ bool AdvancedFlatland::Run()
     {
         for (size_t i = 0; i < _currentGeneration._dimensions._width; ++i)
         {
+            // a kind of optimized glance on adjacent cells
             size_t siblings = 0;
             size_t reproductiveSiblings = 0;
             for (int x = -1; x < 2; ++x)

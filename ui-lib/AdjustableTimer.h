@@ -5,6 +5,8 @@
 class QTimer;
 class QWidget;
 
+// TODO - Bad design, too specific thing for a class
+// QTimer-wrapper that calls a callback when period is expired
 class AdjustableTimer
 {
 public:

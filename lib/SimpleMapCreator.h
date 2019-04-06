@@ -11,6 +11,8 @@ namespace lib
 {
 
 using SimpleCell = bool;
+
+// Creates a random map, see RandomDistributionWithoutLimits
 using SimpleCellMap = FlatlandMap<SimpleCell>;
 SimpleCellMap CreateSimpleMap(const RandomDistributionWithoutLimits& spec);
 

@@ -11,14 +11,14 @@ namespace flatland
 namespace lib
 {
 
-// Defines a world of cells
+// Defines a world of cells. Such cells have no properties except 'is alive' (boolean)
 class SimpleFlatland : public IFlatland
 {
 public:
     // Creates a world of the given size
     SimpleFlatland(const SimpleCellMap& flatlandMap);
 
-    // Evaluates a next generation of cells
+    // Performs a single step of cell evolution within the whole world
     bool Run() override;
 
     // Returns a flatland width

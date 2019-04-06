@@ -85,13 +85,6 @@ void RenderAreaBase::paintEvent(QPaintEvent * /* event */)
                 {
                     const auto color = getColor(i, j);
 
-//                    if (i < 100 || i > size.width()-100)
-//                        color = Qt::blue;
-//                    else if (i > size.width() / 2 - 50 && i < size.width() / 2 +50 &&
-//                             j > size.height() / 2 - 50 && j < size.height() / 2 + 50)
-//                        color = Qt::red;
-//                    painter.setPen(color);
-
                     if (m_scale == 1)
                     {
                         if (!prevColor || *prevColor != color)

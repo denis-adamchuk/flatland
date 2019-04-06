@@ -1,16 +1,15 @@
+// Console application to test Flatland library
+
 #include "lib/SimpleFlatland.h"
 #include "lib/AdvancedFlatland.h"
 
 #include <iostream>
-#include <chrono>
-#include <thread>
-#include <queue>
 
 using namespace flatland;
 using namespace flatland::lib;
 
 template <typename TFlatland>
-void run(TFlatland&& flatland)
+void Run(TFlatland&& flatland)
 {
     while (flatland.Run())
     {
@@ -45,11 +44,11 @@ int main(int argc, char* argv[])
 
     if (maxAge == 0)
     {
-        run(SimpleFlatland(CreateSimpleMap(RandomDistributionWithoutLimits{width, height})));
+        Run(SimpleFlatland(CreateSimpleMap(RandomDistributionWithoutLimits{width, height})));
     }
     else if (maxReproductivityAge != 0)
     {
-        run(AdvancedFlatland(CreateAdvancedMap(RandomDistributionWithoutLimits{width, height}),
+        Run(AdvancedFlatland(CreateAdvancedMap(RandomDistributionWithoutLimits{width, height}),
             maxAge, maxReproductivityAge));
     }
     else

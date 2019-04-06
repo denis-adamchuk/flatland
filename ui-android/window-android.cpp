@@ -39,6 +39,7 @@ Window::Window(QSharedPointer<SimpleFlatland> simpleFlatland,
 
 QSize Window::sizeHint() const
 {
+    // Full-screen
     return QGuiApplication::screens().front()->size();
 }
 

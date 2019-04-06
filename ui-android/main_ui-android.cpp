@@ -16,6 +16,8 @@ int main(int argc, char *argv[])
     const unsigned long defaultScale = 8;
     const unsigned long maxAge = 100;
     const unsigned long maxReproductivityAge = 75;
+
+    // Android application is full-screen, but flatland dimensions are reduced with a default scale (unlike in Desktop)
     const auto widthToUse = static_cast<size_t>(QGuiApplication::screens().front()->size().width()) / defaultScale;
     const auto heightToUse = static_cast<size_t>(QGuiApplication::screens().front()->size().height()) / defaultScale;
 

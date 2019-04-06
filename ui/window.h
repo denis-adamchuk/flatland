@@ -9,6 +9,7 @@
 
 struct RenderAreaBase;
 
+// Main window for Desktop UI version of Flatland application
 template <typename TFlatland>
 class Window : public QWidget
 {

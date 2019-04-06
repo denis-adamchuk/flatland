@@ -34,6 +34,7 @@ Window<TFlatland>::Window(QSharedPointer<TFlatland> flatland)
 template <typename TFlatland>
 QSize Window<TFlatland>::sizeHint() const
 {
+    // Full-screen
     return QGuiApplication::screens().front()->size();
 }
 
@@ -59,8 +60,7 @@ void Window<TFlatland>::mouseMoveEvent(QMouseEvent* event)
     if (m_renderAreaMoveStartPoint.has_value())
     {
         const QPoint pt(event->pos());
-        const QPoint ptNew(pt.x() - m_renderAreaMoveStartPoint->x(),
-                           pt.y() - m_renderAreaMoveStartPoint->y());
+        const QPoint ptNew(pt.x() - m_renderAreaMoveStartPoint->x(), pt.y() - m_renderAreaMoveStartPoint->y());
         m_renderArea->UpdateTopLeft(ptNew);
         m_renderAreaMoveStartPoint = pt;
     }
@@ -78,9 +78,6 @@ template <typename TFlatland>
 void Window<TFlatland>::mouseDoubleClickEvent(QMouseEvent *event)
 {
     const auto scaleFactor = event->button() == Qt::MouseButton::LeftButton ? sc_scaleFactor : 1. / sc_scaleFactor;
-//    const auto scaleFactor = event->button() == Qt::MouseButton::LeftButton
-//            ? static_cast<double>(m_renderArea->GetScale() + 1) / m_renderArea->GetScale()
-//            : 1. / (static_cast<double>(m_renderArea->GetScale() + 1) / m_renderArea->GetScale());
     m_renderArea->Rescale(scaleFactor, event->pos());
     event->accept();
 }

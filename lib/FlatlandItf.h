@@ -8,9 +8,10 @@ namespace flatland
 namespace lib
 {
 
+// Interface to a world of cells
 struct IFlatland
 {
-    // Evaluates a next generation of cells
+    // Performs a single step of cell evolution within the whole world
     virtual bool Run() = 0;
 
     // Returns a cell collection width
