@@ -11,15 +11,22 @@ namespace lib
 }
 }
 
+struct ScalingLimits
+{
+    unsigned long minScale;
+    unsigned long maxScale;
+    unsigned long defaultScale;
+};
+
 class RenderAreaBase : public QWidget
 {
 public:
-    explicit RenderAreaBase(QWidget* parent);
+    explicit RenderAreaBase(QWidget* parent, const ScalingLimits& scalingLimits);
 
     QSize sizeHint() const override;
 
     void UpdateTopLeft(QPoint pt);
-    void Rescale(qreal scale, QPoint pt);
+    void Rescale(qreal scaleFactor, QPoint pt);
     unsigned long GetScale();
 
 protected:
@@ -33,9 +40,12 @@ private:
     // dimensions of drawing area
     QSize m_size;
 
-    // how distant is cell with coordinates (0, 0) from the top left point of the screen
-    QPoint m_relativeTopLeftPoint;
+    // how distant is top left point of the screen from a cell with coordinates (0, 0)
+    QPointF m_visibleAreaOffset;
 
     // current scale, number of pixels that match a single pixel in each of X/Y directions
     unsigned long m_scale;
+
+    // min/max/default scale
+    ScalingLimits m_scalingLimits;
 };

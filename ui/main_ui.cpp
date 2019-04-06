@@ -30,8 +30,10 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
     const auto fullScreen = width == 0 || height == 0;
-    const auto widthToUse = fullScreen ? static_cast<size_t>(QGuiApplication::screens().front()->size().width()) : width;
-    const auto heightToUse = fullScreen ? static_cast<size_t>(QGuiApplication::screens().front()->size().height()) : height;
+    const auto widthToUse = fullScreen ? static_cast<size_t>(QGuiApplication::screens().front()->size().width())
+                                       : width;
+    const auto heightToUse = fullScreen ? static_cast<size_t>(QGuiApplication::screens().front()->size().height())
+                                        : height;
 
     std::unique_ptr<QWidget> p;
     if (maxAge == 0 && maxReproductivityAge == 0)

@@ -10,7 +10,8 @@
 class RenderAreaSimple : public RenderAreaBase
 {
 public:
-    RenderAreaSimple(QWidget* parent, QSharedPointer<flatland::lib::SimpleFlatland> flatland);
+    RenderAreaSimple(QWidget* parent, QSharedPointer<flatland::lib::SimpleFlatland> flatland,
+                     const ScalingLimits& scalingLimits);
 
 private:
     const flatland::lib::IFlatland& getCells() const override;

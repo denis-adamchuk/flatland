@@ -19,12 +19,13 @@ using namespace flatland::lib;
 class Window : public QWidget
 {
 public:
-    Window(QSharedPointer<SimpleFlatland> simpleFlatland, QSharedPointer<AdvancedFlatland> advancedFlatland);
+    Window(QSharedPointer<SimpleFlatland> simpleFlatland,
+           QSharedPointer<AdvancedFlatland> advancedFlatland,
+           unsigned long defaultScale);
 
 protected:
     QSize sizeHint() const override;
     bool event(QEvent* event) override;
-    void paintEvent(QPaintEvent* event) override;
 
 private:
     void processOneTouchPoint(const QTouchEvent& event);
@@ -39,22 +40,8 @@ private:
     AdjustableTimer m_timer;
     RenderAreaBase* m_simpleRenderArea = nullptr;
     RenderAreaBase* m_advancedRenderArea = nullptr;
-
     bool m_isActiveSimpleFlatland = false;
 
-    QSize m_screenSize;
-
-    qreal m_lineLength1;
-    qreal m_lineLength2;
     std::optional<qreal> m_initialLength;
-    qreal m_scale;
-
-    int m_lasttype;
-    int m_lastPointsCount;
-
-    QPoint m_center1;
-    QPoint m_center2;
-
-    unsigned long m_prevScale = 1;
-    qreal m_touchPointRescaleStep = 0;
+    std::optional<unsigned long> m_initialScale;
 };

@@ -4,7 +4,17 @@
 #include "ui-lib/RenderAreaFactory.h"
 #include "ui-lib/AdjustableTimer.h"
 
+#include <QScreen>
+#include <QGuiApplication>
 #include <QWheelEvent>
+
+namespace
+{
+    const unsigned long sc_minScale = 1;  // 1 cell takes area 1x1 px
+    const unsigned long sc_maxScale = 64; // 1 cell takes area 64x64 px
+    const unsigned long sc_defaultScale = 8;
+    const unsigned long sc_scaleFactor = 2;
+}
 
 template <typename TFlatland>
 Window<TFlatland>::Window(QSharedPointer<TFlatland> flatland)
@@ -15,7 +25,7 @@ Window<TFlatland>::Window(QSharedPointer<TFlatland> flatland)
                     flatland->Run();
                     m_renderArea->update();
                 })
-    , m_renderArea(CreateRenderArea(this, flatland))
+    , m_renderArea(CreateRenderArea(this, flatland, {sc_minScale, sc_maxScale, sc_defaultScale}))
 {
     setEnabled(true);
     setWindowTitle("QT-Based Flatland");
@@ -24,7 +34,7 @@ Window<TFlatland>::Window(QSharedPointer<TFlatland> flatland)
 template <typename TFlatland>
 QSize Window<TFlatland>::sizeHint() const
 {
-    return m_renderArea->sizeHint();
+    return QGuiApplication::screens().front()->size();
 }
 
 template <typename TFlatland>
@@ -67,9 +77,10 @@ void Window<TFlatland>::mouseReleaseEvent(QMouseEvent* event)
 template <typename TFlatland>
 void Window<TFlatland>::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    static const double sc_scaleRate = 2;
-
-    m_renderArea->Rescale(event->button() == Qt::MouseButton::LeftButton ? sc_scaleRate : 1. / sc_scaleRate,
-                              event->pos());
+    const auto scaleFactor = event->button() == Qt::MouseButton::LeftButton ? sc_scaleFactor : 1. / sc_scaleFactor;
+//    const auto scaleFactor = event->button() == Qt::MouseButton::LeftButton
+//            ? static_cast<double>(m_renderArea->GetScale() + 1) / m_renderArea->GetScale()
+//            : 1. / (static_cast<double>(m_renderArea->GetScale() + 1) / m_renderArea->GetScale());
+    m_renderArea->Rescale(scaleFactor, event->pos());
     event->accept();
 }

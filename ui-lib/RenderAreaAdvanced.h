@@ -10,7 +10,8 @@
 class RenderAreaAdvanced : public RenderAreaBase
 {
 public:
-    RenderAreaAdvanced(QWidget* parent, QSharedPointer<flatland::lib::AdvancedFlatland> flatland);
+    RenderAreaAdvanced(QWidget* parent, QSharedPointer<flatland::lib::AdvancedFlatland> flatland,
+                       const ScalingLimits& scalingLimits);
 
 private:
     const flatland::lib::IFlatland& getCells() const override;

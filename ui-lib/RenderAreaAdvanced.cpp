@@ -1,12 +1,13 @@
 #include "RenderAreaAdvanced.h"
 
+#include <QDebug>
 #include <QColor>
 
-RenderAreaAdvanced::RenderAreaAdvanced(QWidget* parent, QSharedPointer<flatland::lib::AdvancedFlatland> flatland)
-    : RenderAreaBase(parent)
+RenderAreaAdvanced::RenderAreaAdvanced(QWidget* parent, QSharedPointer<flatland::lib::AdvancedFlatland> flatland,
+                                       const ScalingLimits& scalingLimits)
+    : RenderAreaBase(parent, scalingLimits)
     , m_flatland(flatland)
 {
-
 }
 
 const flatland::lib::IFlatland &RenderAreaAdvanced::getCells() const

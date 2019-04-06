@@ -14,10 +14,6 @@ namespace
     const QRgb sc_backgroundColor = qRgb(250, 250, 215);
     const QRgb sc_externalAreaColor = qRgb(200, 200, 200);
 
-    const unsigned long sc_minScale = 1;  // 1 cell takes area 1x1 px
-    const unsigned long sc_maxScale = 128; // 1 cell takes area 16x16 px
-    const unsigned long sc_defaultScale = sc_minScale;
-
     std::vector<QString> GetLegend(const flatland::lib::IFlatland& flatland)
     {
         std::vector<QString> v;
@@ -33,35 +29,34 @@ namespace
     }
 }
 
-RenderAreaBase::RenderAreaBase(QWidget *parent)
+RenderAreaBase::RenderAreaBase(QWidget *parent, const ScalingLimits& scalingLimits)
     : QWidget(parent)
-    , m_relativeTopLeftPoint{0, 0}
-    , m_scale{sc_defaultScale}
+    , m_scale(scalingLimits.defaultScale)
+    , m_scalingLimits(scalingLimits)
 {
 }
 
 QSize RenderAreaBase::sizeHint() const
 {
-    const auto& cells = getCells();
-    return { static_cast<int>(cells.Width()), static_cast<int>(cells.Height()) };
+    return parentWidget()->sizeHint();
 }
 
 void RenderAreaBase::paintEvent(QPaintEvent * /* event */)
 {
-    const auto& cells = getCells();
-    const QSize& size = sizeHint();
-
     QPainter painter(this);
 
     QFont font = painter.font();
     font.setPixelSize(10);
     painter.setFont(font);
 
+    const QSize& size = sizeHint();
     const QRect rcExt(0, 0, size.width(), size.height());
     painter.fillRect(rcExt, sc_externalAreaColor);
 
-    const QRectF rcBk(m_relativeTopLeftPoint, QSize(size.width() * static_cast<int>(m_scale),
-                                                    size.height() * static_cast<int>(m_scale)));
+    const auto& cells = getCells();
+    const QPointF offsetTopLeft{ -m_visibleAreaOffset.x(), -m_visibleAreaOffset.y() };
+    const QRectF rcBk(offsetTopLeft, QSize(static_cast<int>(cells.Width() * m_scale),
+                                           static_cast<int>(cells.Height() * m_scale)));
     painter.fillRect(rcBk, sc_backgroundColor);
 
     painter.setPen(Qt::red);
@@ -71,39 +66,59 @@ void RenderAreaBase::paintEvent(QPaintEvent * /* event */)
         painter.drawText(QPoint{10, ypos}, s);
         ypos += 20;
     }
-    painter.drawText(QPoint{10, ypos}, QString("m_scale : %1").arg(QString::number(m_scale)));
-    ypos += 20;
-    painter.drawText(QPoint{10, ypos}, QString("m_relativeTopLeftPoint : {%1;%2}").
-                     arg(QString::number(m_relativeTopLeftPoint.x()), QString::number(m_relativeTopLeftPoint.y())));
 
     std::optional<QColor> prevColor;
-    for (size_t j = 0; j < static_cast<size_t>(size.height()); ++j)
+    for (size_t j = 0; j < cells.Height(); ++j)
     {
-        for (size_t i = 0; i < static_cast<size_t>(size.width()); ++i)
+        for (size_t i = 0; i < cells.Width(); ++i)
         {
             if (cells.IsCellAlive(i, j))
             {
                 const auto cellX = static_cast<int>(i);
                 const auto cellY = static_cast<int>(j);
 
-                const auto cellRelativeX = cellX * static_cast<int>(m_scale) + m_relativeTopLeftPoint.x();
-                const auto cellRelativeY = cellY * static_cast<int>(m_scale) + m_relativeTopLeftPoint.y();
+                const auto cellRelativeX = cellX * static_cast<int>(m_scale) - m_visibleAreaOffset.x();
+                const auto cellRelativeY = cellY * static_cast<int>(m_scale) - m_visibleAreaOffset.y();
 
                 if (cellRelativeX >= 0 && cellRelativeX < size.width() &&
                     cellRelativeY >= 0 && cellRelativeY < size.height())
                 {
                     const auto color = getColor(i, j);
-                    if (!prevColor || *prevColor != color)
-                        painter.setPen(color);
-                    prevColor = color;
 
-                    for (size_t sX = 0; sX < m_scale; ++sX)
+//                    if (i < 100 || i > size.width()-100)
+//                        color = Qt::blue;
+//                    else if (i > size.width() / 2 - 50 && i < size.width() / 2 +50 &&
+//                             j > size.height() / 2 - 50 && j < size.height() / 2 + 50)
+//                        color = Qt::red;
+//                    painter.setPen(color);
+
+                    if (m_scale == 1)
                     {
-                        for (size_t sY = 0; sY < m_scale; ++sY)
+                        if (!prevColor || *prevColor != color)
+                            painter.setPen(color);
+                        prevColor = color;
+
+                        for (size_t sX = 0; sX < m_scale; ++sX)
                         {
-                            painter.drawPoint(cellRelativeX + static_cast<int>(sX),
-                                              cellRelativeY + static_cast<int>(sY));
+                            for (size_t sY = 0; sY < m_scale; ++sY)
+                            {
+                                painter.drawPoint(QPointF{cellRelativeX + static_cast<int>(sX),
+                                                          cellRelativeY + static_cast<int>(sY)});
+                            }
                         }
+                    }
+                    else if (m_scale < 8)
+                    {
+                        QRectF rcCell(cellRelativeX, cellRelativeY, m_scale, m_scale);
+                        painter.fillRect(rcCell, color);
+                    }
+                    else
+                    {
+                        QRectF rcCell(cellRelativeX + 1, cellRelativeY + 1, m_scale - 2, m_scale - 2);
+                        painter.fillRect(rcCell, color);
+
+                        painter.setPen(Qt::lightGray);
+                        painter.drawRect(rcCell);
                     }
                 }
             }
@@ -113,28 +128,20 @@ void RenderAreaBase::paintEvent(QPaintEvent * /* event */)
 
 void RenderAreaBase::UpdateTopLeft(QPoint pt)
 {
-    m_relativeTopLeftPoint.setX(m_relativeTopLeftPoint.x() + pt.x());
-    m_relativeTopLeftPoint.setY(m_relativeTopLeftPoint.y() + pt.y());
+    m_visibleAreaOffset.setX(m_visibleAreaOffset.x() - pt.x());
+    m_visibleAreaOffset.setY(m_visibleAreaOffset.y() - pt.y());
     update();
 }
 
-void RenderAreaBase::Rescale(qreal scale, QPoint pt)
+void RenderAreaBase::Rescale(qreal scaleFactor, QPoint pt)
 {
-    const int intScale = scale;
-    const auto newScale = m_scale * intScale;
-    if (newScale != m_scale && newScale >= sc_minScale && newScale <= sc_maxScale)
+    const auto intNewScale = static_cast<unsigned long>(m_scale * scaleFactor);
+    if (intNewScale != m_scale && intNewScale >= m_scalingLimits.minScale && intNewScale <= m_scalingLimits.maxScale)
     {
-        if (newScale > m_scale)
-        {
-            m_relativeTopLeftPoint.setX(intScale * m_relativeTopLeftPoint.x() - pt.x());
-            m_relativeTopLeftPoint.setY(intScale * m_relativeTopLeftPoint.y() - pt.y());
-        }
-        else
-        {
-            m_relativeTopLeftPoint.setX((m_relativeTopLeftPoint.x() + pt.x()) / intScale);
-            m_relativeTopLeftPoint.setY((m_relativeTopLeftPoint.y() + pt.y()) / intScale);
-        }
-        m_scale = static_cast<unsigned long>(newScale);
+        const auto intScaleFactor = static_cast<qreal>(intNewScale) / m_scale;
+        m_visibleAreaOffset = { intScaleFactor * (m_visibleAreaOffset.x() + pt.x()) - pt.x(),
+                                intScaleFactor * (m_visibleAreaOffset.y() + pt.y()) - pt.y() };
+        m_scale = intNewScale;
         update();
     }
 }
