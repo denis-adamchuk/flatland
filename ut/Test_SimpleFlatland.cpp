@@ -57,14 +57,6 @@ SCENARIO("Flatland world original dimensions check")
     REQUIRE_FALSE(flatland.IsCellAlive(1, 1));
 }
 
-SCENARIO("Flatland throws on bad coordinates")
-{
-    const auto simpleMap = CreateDummyMap({{ 1 }});
-    SimpleFlatland flatland(simpleMap);
-
-    REQUIRE_THROWS_WITH(flatland.IsCellAlive(1, 1), "Bad coordinate(s) passed");
-}
-
 SCENARIO("Flatland world next generation dimensions check")
 {
     const auto simpleMap = CreateDummyMap({
