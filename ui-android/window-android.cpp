@@ -116,15 +116,18 @@ void Window::processTwoTouchPoints(const QTouchEvent& event)
     const QLineF line1(touchPoint1.lastScenePos(), touchPoint2.lastScenePos());
     const QLineF line2(touchPoint1.scenePos(), touchPoint2.scenePos());
 
+    const auto currentScale = m_isActiveSimpleFlatland  ? m_simpleRenderArea->GetScale()
+                                                        : m_advancedRenderArea->GetScale();
+
     if (!m_initialLength)
     {
         m_initialLength = line2.length();
-        m_initialScale = m_simpleRenderArea->GetScale();
+        m_initialScale = currentScale;
     }
     else
     {
         const auto rescale = line2.length() / *m_initialLength;
-        const auto adjusted = rescale / (static_cast<qreal>(m_simpleRenderArea->GetScale()) / *m_initialScale);
+        const auto adjusted = rescale / (static_cast<qreal>(currentScale) / *m_initialScale);
         const auto pt = line2.center().toPoint();
         updateScale(adjusted, pt);
     }
