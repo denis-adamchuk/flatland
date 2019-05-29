@@ -90,15 +90,7 @@ void RenderAreaBase::paintEvent(QPaintEvent * /* event */)
                         if (!prevColor || *prevColor != color)
                             painter.setPen(color);
                         prevColor = color;
-
-                        for (size_t sX = 0; sX < m_scale; ++sX)
-                        {
-                            for (size_t sY = 0; sY < m_scale; ++sY)
-                            {
-                                painter.drawPoint(QPointF{cellRelativeX + static_cast<int>(sX),
-                                                          cellRelativeY + static_cast<int>(sY)});
-                            }
-                        }
+                        painter.drawPoint(QPointF{cellRelativeX, cellRelativeY});
                     }
                     else if (m_scale < 8)
                     {
